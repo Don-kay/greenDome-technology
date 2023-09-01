@@ -1,11 +1,25 @@
 const calendar = require("../models/calender");
 const { StatusCodes } = require("http-status-codes");
+const User = require("../models/User");
 const moment = require("moment");
 const { NotFoundError } = require("../errors");
 
 const CreateEvent = async (req, res) => {
-  const event = await calendar.create(req.body);
-  res.status(StatusCodes.CREATED).json({ event });
+  const {
+    user: { userId },
+    body: { title, start, end, description },
+  } = req;
+
+  if (title === " " || start === " " || end === " " || description === "") {
+    res.status(StatusCodes.NOT_FOUND).send("  Fields cannot be empty ");
+  }
+
+  let user = JSON.stringify(req.user.roles);
+  if (user.includes("company") || user.includes("Admin")) {
+    const event = await calendar.create(req.body);
+    res.status(StatusCodes.CREATED).json({ event });
+  }
+  res.status(StatusCodes.NOT_FOUND).send(`not authorized`);
 };
 const GetEvent = async (req, res) => {
   const event = await calendar.find();
@@ -16,36 +30,48 @@ const GetEvent = async (req, res) => {
 };
 const UpdateEvent = async (req, res) => {
   const {
-    body: { title, start, end },
+    user: { userId },
+    body: { title, start, end, description },
     params: { id: eventId },
   } = req;
-  if (title === " " || start === " " || end === " ") {
-    throw new BadRequestError("  Fields cannot be empty ");
+
+  if (title === " " || start === " " || end === " " || description === "") {
+    res.status(StatusCodes.NOT_FOUND).send("  Fields cannot be empty ");
   }
-  const event = await calendar.findOneAndUpdate({ _id: eventId }, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!event) {
-    throw new NotFoundError(` ${title} doesnt exist yet`);
+  let user = JSON.stringify(req.user.roles);
+
+  if (user.includes("company") || user.includes("Admin")) {
+    const event = await calendar.findOneAndUpdate({ _id: eventId }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!event) {
+      throw new NotFoundError(` ${title} doesnt exist yet`);
+    }
+    res
+      .status(StatusCodes.OK)
+      .json({ msg: "schedule successfully updated", event: event });
+  } else {
+    res.status(StatusCodes.NOT_FOUND).send(`not authorized`);
   }
-  res
-    .status(StatusCodes.OK)
-    .json({ msg: "schedule successfully updated", event: event });
 };
 const deleteEvent = async (req, res) => {
   const {
     params: { id: eventId },
   } = req;
-  if (!eventId) {
-    throw new NotFoundError(` no event with ${eventId}`);
+
+  let user = JSON.stringify(req.user.roles);
+
+  if (user.includes("company") || user.includes("Admin")) {
+    const event = await calendar.findOneAndRemove({ _id: eventId });
+    if (!event) {
+      throw new NotFoundError(` Event doesnt exist yet`);
+    }
+    const events = await calendar.find();
+    res.status(StatusCodes.OK).json({ event: event, events: events });
+  } else {
+    res.status(StatusCodes.NOT_FOUND).send(`not authorized`);
   }
-  const event = await calendar.findOneAndRemove({ _id: eventId });
-  if (!event) {
-    throw new NotFoundError(` Event doesnt exist yet`);
-  }
-  const events = await calendar.find();
-  res.status(StatusCodes.OK).json({ event: event, events: events });
 };
 
 module.exports = { CreateEvent, GetEvent, UpdateEvent, deleteEvent };

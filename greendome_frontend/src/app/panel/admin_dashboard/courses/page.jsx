@@ -41,17 +41,17 @@ const allCourses = async () => {
       return newObject;
     };
   }
-  const visibleData = data.map(
-    selectProps(
-      "content4",
-      "content5",
-      "content6",
-      "content7",
-      "content8",
-      "content9",
-      "content10"
-    )
-  );
+  // const visibleData = data.map(
+  //   selectProps(
+  //     "content4",
+  //     "content5",
+  //     "content6",
+  //     "content7",
+  //     "content8",
+  //     "content9",
+  //     "content10"
+  //   )
+  // );
   // console.log(visibleData);
   // const addedContent = visibleData.map((item, id) => {
   //   const cleanContent = Object.entries(item)

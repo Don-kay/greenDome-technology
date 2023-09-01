@@ -30,12 +30,12 @@ const AllCourseDisp = async () => {
   const Courses = await fetchCourses();
   const url = "/panel/admin_dashboard/view-module";
 
-  const courseProp = { data: Courses.classes, count: Courses.count };
+  const courseProp = { data: Courses.course, count: Courses.count };
   const { data, count } = courseProp;
 
   return (
     <main>
-      <div>All modules</div>
+      <div>All course</div>
       <section>
         <div>
           {data?.map((item, id) => {

@@ -46,10 +46,11 @@ const userSlice = createSlice({
     },
     [registerUser.fulfilled]: (state, action) => {
       const { payload } = action;
+      console.log(payload);
       const name = payload.user;
       state.user = name;
       state.isLoading = false;
-      addUserLocalStorage(payload); //stored user token
+      // addUserLocalStorage(payload); //stored user token
       toast.success(`welcom dear ${name.lastname}`);
     },
     [registerUser.rejected]: (state, action) => {
@@ -62,13 +63,13 @@ const userSlice = createSlice({
     },
     [loginUser.fulfilled]: (state, action) => {
       const { payload } = action;
-      console.log(action);
+      console.log(payload);
       const data = { data: payload.data, stats: payload.stats };
       state.user = data;
       state.status = data.stats;
       //paload is grabbing data from the res.data endpoint
       state.isLoading = false;
-      addUserLocalStorage(data);
+      // addUserLocalStorage(data);
       toast.success(`Welcome Back ${name}`);
     },
     [loginUser.rejected]: (state, action) => {

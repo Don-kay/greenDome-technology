@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function TotalSudentPops() {
+export default function TotalStudentPops() {
   const { users, totalStudents, errorMsg } = useSelector(
     (strore) => strore.profiles
   );
@@ -16,7 +16,7 @@ export default function TotalSudentPops() {
 
 export const ActiveStudentPops = () => {
   const { activeStudent, errorMsg } = useSelector((strore) => strore.profiles);
-  console.log(activeStudent);
+  // console.log(activeStudent);
 
   return (
     <section className=" bg-silver flex items-center justify-center flex-col m-auto relative max-w-xmd p-responsive ">
@@ -28,7 +28,7 @@ export const ActiveStudentPops = () => {
 export const TotalTutorsProps = () => {
   const { totalTutors, errorMsg } = useSelector((strore) => strore.profiles);
 
-  console.log(totalTutors);
+  // console.log(totalTutors);
   return (
     <section className=" bg-silver flex items-center justify-center flex-col m-auto relative max-w-xmd p-responsive ">
       <h3>Active Tutors</h3>
@@ -38,7 +38,7 @@ export const TotalTutorsProps = () => {
 };
 export const TotalAdminProps = () => {
   const { totalAdmin, errorMsg } = useSelector((strore) => strore.profiles);
-  console.log(totalAdmin);
+  // console.log(totalAdmin);
 
   return (
     <section className=" bg-silver flex items-center justify-center flex-col m-auto relative max-w-xmd p-responsive ">

@@ -32,7 +32,9 @@ export const updateAdminThunk = async (user, thunkApi) => {
 
   //   }
   const param = user.params;
+  const roles = user.roles;
   // console.log(param);
+  // console.log(roles);
 
   // const {
   //   firstname,

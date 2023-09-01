@@ -33,18 +33,18 @@ export const SidebarEl = [
       {
         id: 3,
         title: "Tutor",
-        urls: "/panel/admin_dashboard/all-students",
+        urls: "/panel/admin_dashboard/all-tutors",
       },
       {
         id: 4,
         title: "Finance",
-        urls: "/panel/admin_dashboard/all-students",
+        urls: "/panel/admin_dashboard/finance",
       },
-      {
-        id: 5,
-        title: "",
-        urls: "/panel/admin_dashboard/all-students",
-      },
+      // {
+      //   id: 5,
+      //   title: "",
+      //   urls: "/panel/admin_dashboard/all-students",
+      // },
     ],
   },
   {
@@ -114,10 +114,6 @@ export const SidebarEl = [
       },
       {
         id: 3,
-        title: "View courses",
-      },
-      {
-        id: 4,
         title: "View Modules",
         urls: "/panel/admin_dashboard/view-module",
       },
@@ -130,12 +126,12 @@ export const SidebarEl = [
     pages: [
       {
         id: 1,
-        title: "Tutor Dashboard",
+        title: "Student Dashboard",
         urls: "/panel/student_dashboard",
       },
       {
         id: 2,
-        title: "Student Dashboard",
+        title: "Tutor Dashboard",
       },
     ],
   },
@@ -188,5 +184,97 @@ export const SidebarEl = [
     title: "Role Types",
     icon: <FaUsersCog />,
     urls: "/panel/admin_dashboard/roleview",
+  },
+];
+export const studentSidebarEl = [
+  {
+    id: 1,
+    title: "Dashboard",
+    icon: <MdDashboardCustomize />,
+    pages: [
+      {
+        id: 1,
+        title: "Panel Overview",
+        urls: "/panel/student_dashboard/overview",
+      },
+      {
+        id: 2,
+        title: "Lecture",
+        urls: "/panel/student_dashboard/lectures",
+      },
+      {
+        id: 3,
+        title: "Finance",
+        urls: "/panel/student_dashboard/all-students",
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: "Curriculum vital",
+    icon: <FaBookReader />,
+    pages: [
+      {
+        id: 1,
+        title: "View all Courses",
+        urls: "/panel/student_dashboard/courses",
+      },
+      {
+        id: 2,
+        title: "Registered Courses",
+        urls: "/panel/student_dashboard/registered-courses",
+      },
+      {
+        id: 3,
+        title: "Reports",
+        urls: "/panel/student_dashboard/report",
+      },
+    ],
+  },
+  {
+    id: 3,
+    title: "Student Profile",
+    icon: <CgProfile />,
+    pages: [
+      {
+        id: 1,
+        title: "Profile",
+        urls: "/panel/student_dashboard/profile",
+      },
+      {
+        id: 2,
+        title: "Calender",
+        urls: "/panel/student_dashboard/calendar",
+      },
+      {
+        id: 3,
+        title: "Mails",
+      },
+      {
+        id: 4,
+        title: "Meetings",
+      },
+    ],
+  },
+  {
+    id: 4,
+    title: "Demography",
+    icon: <GoGraph />,
+    pages: [
+      {
+        id: 1,
+        title: "All Event",
+        urls: "/panel/student_dashboard/demography/all-event",
+      },
+      {
+        id: 2,
+        title: "Upcoming event",
+      },
+      {
+        id: 3,
+        title: "Total Expenses",
+        urls: "/panel/student_dashboard/expenses",
+      },
+    ],
   },
 ];

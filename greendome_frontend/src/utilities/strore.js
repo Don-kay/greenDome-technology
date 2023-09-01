@@ -4,6 +4,7 @@ import functionSlice from "@/features/functions/functionSlice";
 import courseSlice from "@/features/course/courseSlice";
 import profileSlice from "@/features/profile/profileSlice";
 import moduleSlice from "@/features/course/module/moduleSlice";
+import percentageSlice from "@/features/course/percentage/percentageSlice";
 import storage from "redux-persist/lib/storage";
 import {
   persistReducer,
@@ -29,6 +30,7 @@ const reducer = combineReducers({
   profiles: profileSlice,
   course: courseSlice,
   module: moduleSlice,
+  percentage: percentageSlice,
 });
 const persistedReducer = persistReducer(persistConfig, reducer);
 

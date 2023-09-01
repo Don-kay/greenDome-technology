@@ -1,50 +1,68 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import makeAnimated from "react-select/animated";
-import Select from "react-select";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toast } from "react-toastify";
-import { createCourse } from "@/features/course/courseSlice";
+import {
+  createCourse,
+  resetStats,
+  resetCourse,
+} from "@/features/course/courseSlice";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 import { useSelector, useDispatch } from "react-redux";
 import FormRow from "@/components/FormRow";
+import _ from "lodash";
 
 const initialStates = {
   name: "",
   fee: "",
   description: "",
-  content: "",
-  content1: "",
-  content2: "",
-  content3: "",
-  content4: "",
-  content5: "",
-  content6: "",
-  content7: "",
-  content8: "",
-  content9: "",
-  content10: "",
   Serial: "",
 };
 
 const CreateCourse = () => {
+  const router = useRouter();
   const [values, setValues] = useState(initialStates);
-  const { isLoading } = useSelector((store) => store.user);
+  const [category, setCategory] = useState([]);
+  const [trigger, setTrigger] = useState(false);
+  const [file, setFile] = useState();
+  const [img, setImg] = useState(false);
   const disPatch = useDispatch();
+
+  // console.log(stats);
+  // console.log(course);
+  useEffect(() => {
+    disPatch(resetStats());
+    disPatch(resetCourse());
+  }, []);
+
+  const { stats, course } = useSelector((strore) => strore.course);
+  const name = course?.name;
+  const id = course?._id;
+
+  useEffect(() => {
+    if (stats === 201 && course !== undefined) {
+      router.push(`/panel/admin_dashboard/view-module/${name}/${id}`, {
+        shallow: true,
+      });
+    }
+  }, [stats]);
 
   // const statusOptions = [
   //   { value: "1", label: "visible" },
   //   { value: "2", label: "not visible" },
   // ];
-  // const categoryOptions = [
-  //   { value: "1", label: "none" },
-  //   { value: "2", label: "Machine Learning" },
-  //   { value: "3", label: "Html" },
-  //   { value: "4", label: "Css" },
-  //   { value: "4", label: "Node js" },
-  //   { value: "4", label: "React js" },
-  //   { value: "4", label: "Full stack development" },
-  //   { value: "4", label: "UI/UX" },
-  // ];
+  const categoryOptions = [
+    { value: "1", label: "none" },
+    { value: "2", label: "machine learning" },
+    { value: "3", label: "html" },
+    { value: "4", label: "css" },
+    { value: "4", label: "node js" },
+    { value: "4", label: "react js" },
+    { value: "4", label: "full stack development" },
+    { value: "4", label: "UI/UX" },
+  ];
   // const levelOptions = [
   //   { value: "1", label: "beginner" },
   //   { value: "2", label: "intermediate" },
@@ -59,6 +77,43 @@ const CreateCourse = () => {
   //   { value: "2", label: false },
   // ];
 
+  const handleImageFile = (e) => {
+    e.preventDefault();
+    const file = e.target.files;
+
+    if (file[0]?.size < 1024 * 1024 && file[0].type.startsWith("image/")) {
+      setImageFiletoBase(file[0]);
+      console.log(file[0]?.name);
+    } else if (
+      file[0]?.size > 1024 * 1024 &&
+      file[0].type.startsWith("image/")
+    ) {
+      setImg(true);
+    }
+  };
+  const setImageFiletoBase = (file) => {
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        console.log(reader.result);
+        if (reader.result !== "") {
+          setImg(false);
+          setFile(reader.result);
+        }
+      };
+    } catch (error) {
+      return;
+    }
+
+    // setFile(file[0].name);
+  };
+
+  const handleSelectedCategory = (selectedOptions) => {
+    const label = selectedOptions.map((i) => i.label);
+    setCategory(label);
+  };
+
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -67,53 +122,21 @@ const CreateCourse = () => {
   };
   const handleSubmitt = async (e) => {
     e.preventDefault();
-    const {
-      name,
-      fee,
-      description,
-      content,
-      content1,
-      content2,
-      content3,
-      content4,
-      content5,
-      content6,
-      content7,
-      content8,
-      content9,
-      content10,
-      Serial,
-    } = values;
-    if (
-      !name ||
-      !description ||
-      !content ||
-      !content1 ||
-      !content2 ||
-      !content3 ||
-      !content4 ||
-      !Serial
-    ) {
+    const { name, fee, description, Serial } = values;
+    if (!name || !description || !fee || !Serial) {
       toast.error("please fill out all details");
       return;
     }
+
+    const fileType = file === undefined ? "" : file;
     console.log(values);
     disPatch(
       createCourse({
         name: name,
-        fee: fee,
+        fee: parseFloat(fee),
         description: description,
-        content: content,
-        content1: content1,
-        content2: content2,
-        content3: content3,
-        content4: content4,
-        content5: content5,
-        content6: content6,
-        content7: content7,
-        content8: content8,
-        content9: content9,
-        content10: content10,
+        image: fileType,
+        category: category,
         Serial_key: Serial,
       })
     );
@@ -139,96 +162,41 @@ const CreateCourse = () => {
           value={values.fee}
           handleChange={handleChange}
         />
-        <FormRow
-          type="text"
-          name="content"
-          value={values.content}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content1"
-          value={values.content1}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content2"
-          value={values.content2}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content3"
-          value={values.content3}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content4"
-          value={values.content4}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content5"
-          value={values.content5}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content6"
-          value={values.content6}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content7"
-          value={values.content7}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content8"
-          value={values.content8}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content9"
-          value={values.content9}
-          handleChange={handleChange}
-        />
-        <FormRow
-          type="text"
-          name="content10"
-          value={values.content10}
-          handleChange={handleChange}
-        />
+
         <FormRow
           type="text"
           name="description"
           value={values.description}
           handleChange={handleChange}
         />
+        <div>
+          <small>must be above 9 didgits</small>
+          <FormRow
+            type="text"
+            name="Serial"
+            value={values.Serial}
+            handleChange={handleChange}
+          />
+        </div>
 
         <FormRow
-          type="text"
-          name="Serial"
-          value={values.Serial}
-          handleChange={handleChange}
+          type="file"
+          accept="image/*"
+          name="profile-image"
+          // value={values.password}
+          handleChange={handleImageFile}
         />
-        {/* <div>
-          <h5>Status</h5>
-          <Select
-            components={makeAnimated()}
-            name="status"
-            options={statusOptions}
-            id="status"
-            isSearchable
-            noOptionsMessage={() => "status not available"}
-            placeholder="none"
-          />
+        <div>
+          {img && (
+            <small style={{ color: "red" }}>
+              image exceeds 1mb, choose another inage
+            </small>
+          )}
+          {file === "" || file === undefined ? (
+            ""
+          ) : (
+            <Image width={200} height={200} src={file} alt="image" />
+          )}
         </div>
         <div>
           <h5>category</h5>
@@ -236,48 +204,14 @@ const CreateCourse = () => {
             components={makeAnimated()}
             name="category"
             options={categoryOptions}
+            onChange={handleSelectedCategory}
+            isMulti="true"
             id="status"
             isSearchable
             noOptionsMessage={() => "status not available"}
             placeholder="none"
           />
         </div>
-        <div>
-          <h5>Level</h5>
-          <Select
-            components={makeAnimated()}
-            name="level"
-            options={levelOptions}
-            id="status"
-            isSearchable
-            noOptionsMessage={() => "level not available"}
-            placeholder="none"
-          />
-        </div> */}
-        {/* <div>
-          <h5>Featured</h5>
-          <Select
-            components={makeAnimated()}
-            name="featured"
-            options={featuredOptions}
-            id="status"
-            isSearchable
-            noOptionsMessage={() => "featured not available"}
-            placeholder="none"
-          />
-        </div>
-        <div>
-          <h5>Completed</h5>
-          <Select
-            components={makeAnimated()}
-            name="completed"
-            options={completedOptions}
-            id="status"
-            isSearchable
-            noOptionsMessage={() => "checkbox not available"}
-            placeholder="none"
-          />
-        </div> */}
       </form>
     </main>
   );

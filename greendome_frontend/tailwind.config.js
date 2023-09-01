@@ -32,7 +32,7 @@ module.exports = {
         mino: "20%",
         minc: "5%",
         minnelayer: "100%",
-        overviewLayer: "70%",
+        overviewLayer: "60%",
       },
       height: {
         any: "11vh",

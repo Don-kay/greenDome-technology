@@ -1,9 +1,10 @@
 import React from "react";
-import CreateModule from "@/components/Csr-components/pagesComponent/createModule";
+import CreateQuestion from "@/components/Csr-components/pagesComponent/createQuestion";
 
-const set_question = (req) => {
-  const paramId = req.params.id;
+const Createquestion = (req) => {
+  const courseId = req.params.id;
   const paramName = req.params.nameid;
+  const moduleid = req.params.moduleid;
 
   function replaceAll(string, token, newtoken) {
     while (string.indexOf(token) != -1) {
@@ -17,9 +18,13 @@ const set_question = (req) => {
   // console.log(paramsName);
   return (
     <main>
-      <CreateModule paramsName={paramsName} paramsId={paramId} />
+      <CreateQuestion
+        moduleid={moduleid}
+        paramName={paramsName}
+        courseid={courseId}
+      />
     </main>
   );
 };
 
-export default set_question;
+export default Createquestion;

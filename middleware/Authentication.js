@@ -5,6 +5,7 @@ const { UnauthenticatedError } = require("../errors");
 const auth = (req, res, next) => {
   //check if theres no token in headers
   const AuthHeader = req.headers.cookie || req.headers.Cookie;
+  // console.log(AuthHeader);
   if (!AuthHeader || !AuthHeader.startsWith("myToken")) {
     throw new UnauthenticatedError("Authentication not valid");
   } //i had a bug with startswith instead of startsWith and this caused user not been passes (err)

@@ -2,21 +2,34 @@
 import React, { useState, useRef, forwardRef, useEffect } from "react";
 import axios from "axios";
 import _ from "lodash";
+import Image from "next/image";
 import { getQuestions } from "@/features/course/module/moduleSlice";
 import { useRouter } from "next/navigation";
 import FormRow from "@/components/FormRow";
+import Modal from "react-modal";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 
-function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
+function EditQuestion({
+  moduleParam,
+  questionParam,
+  paramName,
+  courseid,
+  isOpen,
+  onClosed,
+  Questions,
+  setQuestion,
+}) {
   const router = useRouter();
   const dispatch = useDispatch();
+  const [file, setFile] = useState("");
+  const [img, setImg] = useState(false);
   // const { allQuestions } = useSelector((strore) => strore.module);
   const [questionCont, setQuestionCont] = useState([]);
   // console.log(moduleParam);
   // console.log(moduleName);
   // console.log(courseName);
-  const url = "/panel/admin_dashboard/view-module";
+  const url2 = "/panel/admin_dashboard/create-module";
   const initialQuestions = {
     questions: "",
     a: "",
@@ -24,6 +37,7 @@ function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
     c: "",
     d: "",
     answer: "",
+    image: "undefined",
   };
   const [updatedQuestion, setUpdatedQuestion] = useState(initialQuestions);
 
@@ -48,6 +62,11 @@ function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
         const option2 = _.toString(singleQuestion?.map((i) => i.option2));
         const option3 = _.toString(singleQuestion?.map((i) => i.option3));
         const option4 = _.toString(singleQuestion?.map((i) => i.option4));
+        const image = _.toString(singleQuestion?.map((i) => i.image));
+        // console.log(image);
+
+        const img = !image ? "" : image;
+
         setUpdatedQuestion({
           questions: questions,
           answer: answer,
@@ -55,7 +74,9 @@ function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
           b: option2,
           c: option3,
           d: option4,
+          image: img,
         });
+        setFile(img);
         // setQuestionCont(resp.data);
       };
 
@@ -63,9 +84,54 @@ function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
     } catch (error) {
       return { msg: error.response.data };
     }
-  }, []);
+  }, [questionParam]);
 
   // const id = _.toString(singleQuestion?.map((i) => i._id));
+
+  const customStyles = {
+    content: {
+      position: "relative",
+      top: "20vh",
+      left: "0%",
+      minWidth: "100vw",
+      minHeight: "100vh",
+      backgroundColor: "red",
+      //   transform: "translate(-50%, -50%)",
+      zIndex: 2120,
+    },
+  };
+
+  const handleImageFile = (e) => {
+    e.preventDefault();
+    const file = e.target.files;
+
+    if (file[0]?.size < 1024 * 1024 && file[0].type.startsWith("image/")) {
+      setImageFiletoBase(file[0]);
+      // console.log(file[0]?.name);
+    } else if (
+      file[0]?.size > 1024 * 1024 &&
+      file[0].type.startsWith("image/")
+    ) {
+      setImg(true);
+    }
+  };
+  const setImageFiletoBase = (file) => {
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        // console.log(reader.result);
+        if (reader.result !== "") {
+          setImg(false);
+          setFile(reader.result);
+        }
+      };
+    } catch (error) {
+      return;
+    }
+
+    // setFile(file[0].name);
+  };
 
   const handleChange = (e) => {
     const name = e.target.name;
@@ -90,6 +156,7 @@ function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
         option3: c,
         option4: d,
         answer: answer,
+        image: file,
       },
       {
         withCredentials: true,
@@ -98,8 +165,24 @@ function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
     );
     console.log(res.data);
 
-    router.push(`${url}/${courseName}/${moduleName}/${moduleParam}`);
+    const updateQuestion = res.data.questions;
+    const updatedId = updateQuestion._id;
+    const refreshed = Questions.filter((item) => item._id !== updatedId);
 
+    const refreshedQuestion = [...refreshed, updateQuestion];
+
+    let sortedQuestions = refreshedQuestion.sort((r1, r2) =>
+      r1.createdAt > r2.createdAt ? 1 : r1.createdAt < r2.createdAt ? -1 : 0
+    );
+
+    setQuestion(sortedQuestions);
+    if (updatedId !== "") {
+      onClosed();
+    }
+
+    // router.push(`${url2}/${paramName}/${courseid}/${moduleParam}`);
+
+    return res.data;
     // dispatch(
     //   adminUpdateUsers({
     //     params: profileParams,
@@ -115,9 +198,28 @@ function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
     //     dispatch(GetAllUsers());
   };
   return (
-    <main>
+    <Modal style={customStyles} isOpen={isOpen} onRequestClose={onClosed}>
+      <button onClick={() => onClosed()}>Go Back</button>
       <form onSubmit={handleSubmit}>
         {/* <h1>Update {`${username}`} profile</h1> */}
+
+        <FormRow
+          type="file"
+          accept="image/*"
+          name="profile-image"
+          // value={url}
+          handleChange={handleImageFile}
+        />
+        <div>
+          {img && (
+            <small style={{ color: "red" }}>
+              image exceeds 1mb, choose another inage
+            </small>
+          )}
+          {file !== "" && (
+            <Image width={200} height={200} src={file} alt="image" />
+          )}
+        </div>
 
         <div>
           <FormRow
@@ -165,7 +267,7 @@ function EditQuestion({ moduleParam, questionParam, courseName, moduleName }) {
         <button>submit</button>
       </form>
       <div>editProfile</div>;
-    </main>
+    </Modal>
   );
 }
 

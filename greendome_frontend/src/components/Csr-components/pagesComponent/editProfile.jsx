@@ -6,16 +6,30 @@ import { adminUpdateUsers } from "@/features/profile/profileSlice";
 import makeAnimated from "react-select/animated";
 import _ from "lodash";
 import { GetAllUsers } from "@/features/profile/profileSlice";
-import functionsSpace from "@/features/functions/functions";
 import { useRouter } from "next/navigation";
+import customFetch from "@/utilities/axios";
+import Image from "next/image";
+import Modal from "react-modal";
+import { ToggleTrigger } from "@/features/functions/functionSlice";
+import Greendome from "../../asset/greendome.jpg";
+import functionsSpace from "@/features/functions/functions";
 import FormRow from "@/components/FormRow";
 import { setActiveParams } from "@/features/profile/profileSlice";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 
-function EditProfile({ params }) {
+function EditProfile({
+  params,
+  studentid,
+  isOpen,
+  onClosed,
+  setUser,
+  setPhoto,
+}) {
   // const router = useRouter();
   const dispatch = useDispatch();
+  const router = useRouter();
+  const { triggers2 } = useSelector((state) => state.functions);
   const {
     profileParams,
     users,
@@ -48,14 +62,15 @@ function EditProfile({ params }) {
     dispatch(GetAllUsers());
   }, []);
 
-  const paramsId = params;
+  // const paramsId = params;
   // const user = users.data?.user;
   // const user = data?.user;
-  const singlProfile = users?.filter((item) => item.id === paramsId);
+  const singlProfile = users?.filter((item) => item.id === studentid);
   // console.log(singlProfile);
   // const newArray = singlProfile.map((a) => ({ ...a }));
   const id = _.toString(singlProfile?.map((i) => i.id));
   const firstname = _.toString(singlProfile?.map((i) => i.firstname));
+  const image = _.toString(singlProfile?.map((i) => i.image));
   const lastname = _.toString(singlProfile?.map((i) => i.lastname));
   const country = _.toString(singlProfile?.map((i) => i.country));
   const mobilenumber = _.toString(singlProfile?.map((i) => i.mobilenumber));
@@ -66,9 +81,13 @@ function EditProfile({ params }) {
 
   const flattenCert = certificate.flat(1);
   const flattenRoles = roles.flat(1);
+  // console.log(flattenRoles);
+  const imgs = image === "undefined" || image === "" ? "" : image;
 
-  const [roleCont, setRoleCont] = useState();
+  const [roleCont, setRoleCont] = useState(flattenRoles);
+  const [file, setFile] = useState(imgs);
   const [certCont, setCertCont] = useState();
+  const [img, setImg] = useState(false);
   const [countryZip, setCountryZip] = useState([]);
   const roleOptions = [
     { value: "1", label: "student" },
@@ -93,26 +112,27 @@ function EditProfile({ params }) {
     { value: "6", label: "363" },
   ];
   useEffect(() => {
-    // if (roleCont.length === 0) {
-    //   setRoleCont(roles);
-    // } else {
-    //   handleSelected;
-    // }
     setRoleCont(flattenRoles);
-    // if (countryZip.length === 0) {
-    //   setCountryZip(country);
-    // } else {
-    //   handleSelected;
-    // }
     setCountryZip(country);
     setCertCont(flattenCert);
-    // if (certCont.length === 0) {
-    //   setCertCont(certificate);
-    // } else if (certCont.length > 0) {
-    //   handleSelectedCert;
-    // }
-    // console.log(certCont.length);
-  }, []);
+
+    onClosed();
+  }, [triggers2]);
+
+  const customStyles = {
+    content: {
+      position: "relative",
+      top: "0vh",
+      left: "15%",
+      minWidth: "100vw",
+      overflow: "auto",
+      maxHeight: "100vh",
+      backgroundColor: "red",
+      //   transform: "translate(-50%, -50%)",
+      zIndex: 2120,
+    },
+  };
+
   const roleDisplay = functionsSpace(roles);
   const certDisplay = functionsSpace(certificate);
   const byt = "123";
@@ -124,6 +144,37 @@ function EditProfile({ params }) {
     biography: biography,
   });
 
+  const handleImageFile = (e) => {
+    e.preventDefault();
+    const file = e.target.files;
+
+    if (file[0]?.size < 1024 * 1024 && file[0].type.startsWith("image/")) {
+      setImageFiletoBase(file[0]);
+      // console.log(file[0]?.name);
+    } else if (
+      file[0]?.size > 1024 * 1024 &&
+      file[0].type.startsWith("image/")
+    ) {
+      setImg(true);
+    }
+  };
+  const setImageFiletoBase = (file) => {
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        // console.log(reader.result);
+        if (reader.result !== "") {
+          setImg(false);
+          setFile(reader.result);
+        }
+      };
+    } catch (error) {
+      return;
+    }
+
+    // setFile(file[0].name);
+  };
   const zip = ` + ${updatedUser.country}`;
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef();
@@ -156,7 +207,7 @@ function EditProfile({ params }) {
   };
 
   useEffect(() => {
-    dispatch(setActiveParams(paramsId));
+    dispatch(setActiveParams(studentid));
   }, []);
   // console.log(typeof roles);
 
@@ -177,51 +228,95 @@ function EditProfile({ params }) {
       !certificate ||
       !country ||
       !mobilenumber ||
-      !biography
+      !biography ||
+      !file
     ) {
       toast.error("please fill all details");
     }
     // console.log(`items in container ${roleCont} ${profileParams} ${id}`);
     // console.log(roleDisplay);
+    const imageType = file === undefined || file === "" ? "" : file;
 
-    // const res = await axios.put(
-    //   "http://localhost:8000/greendometech/ng/auth/users/update/6480d2355c177a3d245857e4",
-    //   {
-    //     firstname: firstname,
-    //     lastname: lastname,
-    //     biography: biography,
-    //     certificate: certCont,
-    //     mobilenumber: mobilenumber,
-    //     country: _.toString(countryZip),
-    //     roles: roleCont,
-    //   },
-    //   {
-    //     withCredentials: true,
-    //     credentials: "include",
-    //   }
-    // );
-    // console.log(res.data);
-
-    dispatch(
-      adminUpdateUsers({
-        params: profileParams,
+    const res = await axios.put(
+      `http://localhost:8000/greendometech/ng/auth/users/update/${id}`,
+      {
         firstname: firstname,
         lastname: lastname,
+        biography: biography,
         certificate: certCont,
         mobilenumber: mobilenumber,
-        biography: biography,
-        roles: roleCont,
         country: _.toString(countryZip),
-      })
+        roles: roleCont,
+        image: imageType,
+      },
+      {
+        withCredentials: true,
+        credentials: "include",
+      }
     );
-    dispatch(GetAllUsers());
+    const user = res.data.user;
+    console.log(user);
+
+    if (user.id !== "" || user.id !== undefined) {
+      setUser({
+        id: user.id,
+        email: user.email,
+        country: user.country,
+        mobilenumber: user.mobilenumber,
+        image: user.image,
+        roles: user.roles,
+        certificate: user.certificate,
+        classesId: user.classesId,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+        biography: user.biography,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      });
+      dispatch(GetAllUsers());
+      dispatch(ToggleTrigger());
+      //setPhoto(user.image);
+      // window.location.reload();
+    }
+
+    // dispatch(
+    //   adminUpdateUsers({
+    //     params: profileParams,
+    //     firstname: firstname,
+    //     lastname: lastname,
+    //     certificate: certCont,
+    //     mobilenumber: mobilenumber,
+    //     biography: biography,
+    //     roles: roleCont,
+    //     country: _.toString(countryZip),
+    //   })
+    // );
   };
 
   return (
-    <main>
+    <Modal style={customStyles} isOpen={isOpen} onRequestClose={onClosed}>
       <form onSubmit={handleSubmit}>
         <h1>Update {`${username}`} profile</h1>
+        <button onClick={() => onClosed()}>back</button>
 
+        <FormRow
+          type="file"
+          accept="image/*"
+          name="profile-image"
+          // value={url}
+          handleChange={handleImageFile}
+        />
+        <div>
+          {img && (
+            <small style={{ color: "red" }}>
+              image exceeds 1mb, choose another inage
+            </small>
+          )}
+          {file !== "" && (
+            <Image width={200} height={200} src={file} alt="image" />
+          )}
+        </div>
         <div>
           <FormRow
             type="text"
@@ -299,7 +394,7 @@ function EditProfile({ params }) {
         <button>submit</button>
       </form>
       <div>editProfile</div>;
-    </main>
+    </Modal>
   );
 }
 

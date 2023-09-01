@@ -1,4 +1,3 @@
-import CreateCourse from "@/components/Csr-components/pagesComponent/createCourse";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { AllCoursesThunk, CreateCoursesThunk } from "./courseThunk";
 
@@ -7,6 +6,7 @@ const initialState = {
   isLoading: false,
   TotalCourse: 0,
   ratedCourse: "",
+  stats: null,
 };
 
 export const GetAllCourse = createAsyncThunk(
@@ -28,6 +28,12 @@ const courseSlice = createSlice({
     },
     setRatedCourse: (state, action) => {
       state.ratedCourse = action.payload;
+    },
+    resetStats: (state) => {
+      state.stats = null;
+    },
+    resetCourse: (state) => {
+      state.course = undefined;
     },
   },
 
@@ -55,8 +61,9 @@ const courseSlice = createSlice({
     [createCourse.fulfilled]: (state, action) => {
       const { payload } = action;
       console.log(payload);
-      // state.course = payload.data.course;
+      state.course = payload.data.course;
       // state.TotalCourse = payload.data.count;
+      state.stats = payload.stats;
       state.isLoading = false;
     },
     [createCourse.rejected]: (state, action) => {
@@ -67,6 +74,7 @@ const courseSlice = createSlice({
   },
 });
 
-export const { setTotalCourse, setRatedCourse } = courseSlice.actions;
+export const { setTotalCourse, setRatedCourse, resetStats, resetCourse } =
+  courseSlice.actions;
 
 export default courseSlice.reducer;

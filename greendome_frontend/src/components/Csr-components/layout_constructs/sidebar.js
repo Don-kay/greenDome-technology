@@ -2,25 +2,66 @@
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import _ from "lodash";
+import customFetch from "@/utilities/axios";
 import { AiFillSetting } from "react-icons/ai";
 import { BiCalendar } from "react-icons/bi";
-import { toggleSubmenu } from "@/features/functions/functionSlice";
+import EditProfile from "../pagesComponent/editProfile";
+import { GetAllUsers } from "@/features/profile/profileSlice";
+import {
+  toggleSubmenu,
+  ToggleTrigger2,
+} from "@/features/functions/functionSlice";
 import { toggleSideBar } from "@/features/functions/functionSlice";
-import { SidebarEl } from "../../data/elements";
+import { SidebarEl, studentSidebarEl } from "../../data/elements";
 import Dennis from "../../asset/dennis.jpg";
 import { useSelector, useDispatch } from "react-redux";
 
-const Sidebar = () => {
+const Sidebar = ({ IsAdmin, IsStudent }) => {
+  const dispatch = useDispatch();
   const [showLinks, setShowLinks] = useState(false);
-  const { isSubmenuOpen, isSideBarOpen } = useSelector(
+  const { isSubmenuOpen, isSideBarOpen, triggers, triggers2 } = useSelector(
     (state) => state.functions
   );
+  // const { users } = useSelector((strore) => strore.profiles);
   const { user } = useSelector((strore) => strore.user);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const admin = user.data.user;
-  const adminParams = admin.id;
+  // const image = users.image;
 
-  const dispatch = useDispatch();
+  const [photo, setPhoto] = useState();
+  const [Params, setParams] = useState();
+  // const [photo, setPhoto] = useState(image);
+
+  useEffect(() => {
+    const userProfiles = user.data.user;
+    const Params = userProfiles.id;
+    setParams(Params);
+    const fetchUsers = async () => {
+      try {
+        const res = await customFetch.get("/auth/users", {
+          withCredentials: true,
+          credentials: "include",
+        });
+        const resp = { data: res.data, stats: res.status };
+        // console.log(res);
+        const users = resp.data.user;
+        const profile = users.filter((i) => i.id === Params);
+        const profilePhoto = _.toString(profile.map((i) => i.image));
+        setPhoto(profilePhoto);
+        if (profilePhoto !== "") {
+          dispatch(ToggleTrigger2());
+        }
+      } catch (error) {
+        return { msg: error?.response.data };
+      }
+    };
+
+    fetchUsers();
+  }, [triggers]);
+
+  const isStudent = _.toString(IsStudent);
+  const isAdmin = _.toString(IsAdmin);
 
   const linkContainerRef = useRef(null);
   const linksRef = useRef(null);
@@ -63,7 +104,9 @@ const Sidebar = () => {
   return (
     <main
       className={
-        "sidebar  relative bg-dark    h-screen flex justify-center items-center flex-col"
+        isStudent
+          ? "sidebar  relative bg-bubblegum    h-screen flex justify-center items-center flex-col"
+          : "sidebar  relative bg-dark    h-screen flex justify-center items-center flex-col"
       }
     >
       <section
@@ -74,102 +117,204 @@ const Sidebar = () => {
         }
       >
         <div className="imgCont inline-block items-stretch m-3 overflow-hidden max-w-md h-any rounded-full">
-          <Image src={Dennis} alt="image 2" className="  h-32 w-52 " />
+          {photo !== "" || photo !== undefined ? (
+            <Image width={200} height={200} src={photo} alt="image" />
+          ) : (
+            <Image width={200} height={200} src={Dennis} alt="image" />
+          )}
         </div>
       </section>
+      <EditProfile
+        onClosed={() => setModalOpen(false)}
+        isOpen={modalOpen}
+        setPhoto={setPhoto}
+      />
       <section className="  bg-metal top-12 cursor-pointer overflow-scroll relative flex justify-center p-responsive items-center flex-col h-5/6 min-w-sidebarImg ">
-        {SidebarEl.map((item, id) => {
-          const { title, icon, pages, urls } = item;
-          let param = "";
-          let role = null;
-          if (id === 2) {
-            param = `/${adminParams}`;
-          }
-          if (id === 8) {
-            role = `/${urls}`;
-          }
-          const titled = title === "Role Types";
-
-          return (
-            <section
-              key={id}
-              className={
-                isSideBarOpen
-                  ? "sec relative -top-14 "
-                  : "sec relative -top-16 left-28 "
+        {isStudent
+          ? studentSidebarEl.map((item, id) => {
+              const { title, icon, pages, urls } = item;
+              let param = `/${Params}`;
+              let role = null;
+              // if (id === 1) {
+              //   param = `/${studentParams}`;
+              // }
+              if (id === 8) {
+                role = `/${urls}`;
               }
-            >
-              <div
-                key={id}
-                className={
-                  isSideBarOpen
-                    ? "elements m-4 flex flex-row items-center"
-                    : "elements m-4 relative flex flex-row items-center"
-                }
-                onClick={() => openSubmenu(id)}
-              >
-                <div className=" mr-6" onClick={() => openMenu()}>
-                  {icon}
-                </div>
-                {titled ? (
-                  <Link key={id} href={`${urls}`}>
-                    <h3
-                      className={
-                        isSideBarOpen
-                          ? " text-white text-17 tracking-wider font-medium "
-                          : " text-white text-17 opacity-0 tracking-wider font-medium "
-                      }
-                    >
-                      {title}
-                    </h3>
-                  </Link>
-                ) : (
-                  <h3
-                    className={
-                      isSideBarOpen
-                        ? " text-white text-17 tracking-wider font-medium "
-                        : " text-white text-17 opacity-0 tracking-wider font-medium "
-                    }
-                  >
-                    {title}
-                  </h3>
-                )}
-              </div>
-              <div
-                ref={linkContainerRef}
-                className={
-                  isSubmenuOpen === id
-                    ? "sub left-5 overflow-hidden top-0 relative flex  h-unimport justify-start  duration-700  w-64"
-                    : "sub bg-midnight left-5 overflow-hidden top-0  relative flex justify-start transition-500 duration-700  flex-col  h-0 w-64"
-                }
-              >
-                <ul
-                  ref={linksRef}
+              const titled = title === "Role Types";
+
+              return (
+                <section
+                  key={id}
                   className={
-                    isSubmenuOpen === id && isSideBarOpen
-                      ? "sub bg-tahiti overflow-hidden top-0 relative  inline-block  flex-col  transition-800 ease-linear duration-500 w-64"
-                      : "sub overflow-hidden  -top-28 transition-500 duration-700 inline-block  flex-col h-0 w-64"
+                    isSideBarOpen
+                      ? "sec relative -top-14 "
+                      : "sec relative -top-16 left-28 "
                   }
                 >
-                  {pages?.map((item, idx) => {
-                    const { title, id, urls } = item;
-                    // let url = "";
-                    // if (id === 0) {
-                    //   url = "/thety";
-                    // }
-                    return (
-                      <Link key={idx} href={`${urls}${param}`}>
-                        <li className="subcont  m-5 ">
-                          <h3 className=" text-white text-17 ">{title}</h3>
-                        </li>
+                  <div
+                    key={id}
+                    className={
+                      isSideBarOpen
+                        ? "elements m-4 flex flex-row items-center"
+                        : "elements m-4 relative flex flex-row items-center"
+                    }
+                    onClick={() => openSubmenu(id)}
+                  >
+                    <div className=" mr-6" onClick={() => openMenu()}>
+                      {icon}
+                    </div>
+                    {titled ? (
+                      <Link key={id} href={`${urls}`}>
+                        <h3
+                          className={
+                            isSideBarOpen
+                              ? " text-white text-17 tracking-wider font-medium "
+                              : " text-white text-17 opacity-0 tracking-wider font-medium "
+                          }
+                        >
+                          {title}
+                        </h3>
                       </Link>
-                    );
-                  })}
-                </ul>
-              </div>
-            </section>
-          );
-        })}
+                    ) : (
+                      <h3
+                        className={
+                          isSideBarOpen
+                            ? " text-white text-17 tracking-wider font-medium "
+                            : " text-white text-17 opacity-0 tracking-wider font-medium "
+                        }
+                      >
+                        {title}
+                      </h3>
+                    )}
+                  </div>
+                  <div
+                    ref={linkContainerRef}
+                    className={
+                      isSubmenuOpen === id
+                        ? "sub left-5 overflow-hidden top-0 relative flex  h-unimport justify-start  duration-700  w-64"
+                        : "sub bg-midnight left-5 overflow-hidden top-0  relative flex justify-start transition-500 duration-700  flex-col  h-0 w-64"
+                    }
+                  >
+                    <ul
+                      ref={linksRef}
+                      className={
+                        isSubmenuOpen === id && isSideBarOpen
+                          ? "sub bg-tahiti overflow-hidden top-0 relative  inline-block  flex-col  transition-800 ease-linear duration-500 w-64"
+                          : "sub overflow-hidden  -top-28 transition-500 duration-700 inline-block  flex-col h-0 w-64"
+                      }
+                    >
+                      {pages?.map((item, idx) => {
+                        const { title, id, urls } = item;
+                        // let url = "";
+                        // if (id === 0) {
+                        //   url = "/thety";
+                        // }
+                        return (
+                          <Link key={idx} href={`${urls}${param}`}>
+                            <li className="subcont  m-5 ">
+                              <h3 className=" text-white text-17 ">{title}</h3>
+                            </li>
+                          </Link>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </section>
+              );
+            })
+          : SidebarEl.map((item, id) => {
+              const { title, icon, pages, urls } = item;
+              let param = "";
+              let role = null;
+              if (id === 2) {
+                param = `/${Params}`;
+              }
+              if (id === 8) {
+                role = `/${urls}`;
+              }
+              const titled = title === "Role Types";
+
+              return (
+                <section
+                  key={id}
+                  className={
+                    isSideBarOpen
+                      ? "sec relative -top-14 "
+                      : "sec relative -top-16 left-28 "
+                  }
+                >
+                  <div
+                    key={id}
+                    className={
+                      isSideBarOpen
+                        ? "elements m-4 flex flex-row items-center"
+                        : "elements m-4 relative flex flex-row items-center"
+                    }
+                    onClick={() => openSubmenu(id)}
+                  >
+                    <div className=" mr-6" onClick={() => openMenu()}>
+                      {icon}
+                    </div>
+                    {titled ? (
+                      <Link key={id} href={`${urls}`}>
+                        <h3
+                          className={
+                            isSideBarOpen
+                              ? " text-white text-17 tracking-wider font-medium "
+                              : " text-white text-17 opacity-0 tracking-wider font-medium "
+                          }
+                        >
+                          {title}
+                        </h3>
+                      </Link>
+                    ) : (
+                      <h3
+                        className={
+                          isSideBarOpen
+                            ? " text-white text-17 tracking-wider font-medium "
+                            : " text-white text-17 opacity-0 tracking-wider font-medium "
+                        }
+                      >
+                        {title}
+                      </h3>
+                    )}
+                  </div>
+                  <div
+                    ref={linkContainerRef}
+                    className={
+                      isSubmenuOpen === id
+                        ? "sub left-5 overflow-hidden top-0 relative flex  h-unimport justify-start  duration-700  w-64"
+                        : "sub bg-midnight left-5 overflow-hidden top-0  relative flex justify-start transition-500 duration-700  flex-col  h-0 w-64"
+                    }
+                  >
+                    <ul
+                      ref={linksRef}
+                      className={
+                        isSubmenuOpen === id && isSideBarOpen
+                          ? "sub bg-tahiti overflow-hidden top-0 relative  inline-block  flex-col  transition-800 ease-linear duration-500 w-64"
+                          : "sub overflow-hidden  -top-28 transition-500 duration-700 inline-block  flex-col h-0 w-64"
+                      }
+                    >
+                      {pages?.map((item, idx) => {
+                        const { title, id, urls } = item;
+                        // let url = "";
+                        // if (id === 0) {
+                        //   url = "/thety";
+                        // }
+                        return (
+                          <Link key={idx} href={`${urls}${param}`}>
+                            <li className="subcont  m-5 ">
+                              <h3 className=" text-white text-17 ">{title}</h3>
+                            </li>
+                          </Link>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </section>
+              );
+            })}
         <div
           className={
             isSideBarOpen

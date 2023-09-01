@@ -31,7 +31,7 @@ const AllEvents = () => {
             credentials: "includes",
           }
         );
-        const data = response.data;
+        const data = response.data.event;
         console.log(data);
         setEvent(data.event);
         //  setCount(data.count);

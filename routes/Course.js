@@ -6,12 +6,15 @@ const AuthenticateRoles = require("../middleware/AuthenticateRoles");
 const {
   GetUserCourses,
   GetAllCourses,
+  AdminGetAllSingleCourses,
+  AdminGetAllSingleCourseByClass,
   CreateCourse,
   GetSingleCourse,
   UpdateCourse,
   DeleteCourse,
   UpdateAllCourse,
-  DeleteAllCourse,
+  AdminDeleteCourse,
+  AdminDeleteCourseByClass,
 } = require("../controllers/Course");
 
 const {
@@ -19,8 +22,11 @@ const {
   CreateManyQuestion,
   getUserQuestion,
   getAllUserQuestion,
+  AdmingetAllUserQuestion,
   UpdateUserQuestion,
   DeleteUserQuestion,
+  AdminDeleteUserQuestion,
+  AdminDeleteUserQuestionByClass,
 } = require("../controllers/QuestionAnswer");
 
 Router.route("/create-module/:nameid/:id")
@@ -33,21 +39,36 @@ Router.route("/create-module/:nameid/:id")
     GetUserCourses
   );
 //assessment route
-Router.route("/assessment/create_question/:id").post(CreateQuestion);
+Router.route("/assessment/create_question/:id/:courseid").post(CreateQuestion);
 Router.route("/assessment/create_multiple_question/:id").post(
   CreateManyQuestion
 );
 Router.route("/assessment/questions/:id").get(getUserQuestion);
 Router.route("/assessment/all-questions/:id").get(getAllUserQuestion);
+Router.route("/assessment/admin/all-questions/:id").get(
+  AdmingetAllUserQuestion
+);
 Router.route("/assessment/questions/update/:id/:moduleId").put(
   UpdateUserQuestion
 );
 Router.route("/assessment/questions/delete/:id/:moduleId").delete(
   DeleteUserQuestion
 );
+Router.route("/assessment/admin/questions/delete/:id/:moduleId").delete(
+  AdminDeleteUserQuestionByClass
+);
+Router.route("/assessment/admin/delete-question/:id/:moduleId").delete(
+  AdminDeleteUserQuestion
+);
 //end of assessment route
+
+//view all modules by admin
 Router.route("/view-all-module").get(GetAllCourses);
-Router.route("/:id")
+Router.route("/admin/view-module/:id").get(AdminGetAllSingleCourses);
+Router.route("/admin/course/view-module/:id").get(
+  AdminGetAllSingleCourseByClass
+);
+Router.route("/view-module/:id")
   .get(
     AuthenticateRoles(Role_List.C1856, Role_List.A3769, Role_List.T5798),
     GetSingleCourse
@@ -60,12 +81,16 @@ Router.route("/:id")
     AuthenticateRoles(Role_List.C1856, Role_List.A3769, Role_List.T5798),
     UpdateCourse
   );
-Router.route("/admin-delete-course/:id").delete(
+Router.route("/admin-delete-module/:id").delete(
   AuthenticateRoles(Role_List.C1856, Role_List.A3769, Role_List.T5798),
-  DeleteAllCourse
+  AdminDeleteCourse
 );
-Router.route("/admin-update-course/:id").patch(
+Router.route("/admin-delete-module/:id/:courseid").delete(
   AuthenticateRoles(Role_List.C1856, Role_List.A3769, Role_List.T5798),
+  AdminDeleteCourseByClass
+);
+Router.route("/admin-update-module/:id").patch(
+  AuthenticateRoles(Role_List.C1856, Role_List.A3769),
   UpdateAllCourse
 );
 

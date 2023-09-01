@@ -5,22 +5,43 @@ import { GetAllUsers } from "@/features/profile/profileSlice";
 import makeAnimated from "react-select/animated";
 import StudentsSlice from "../minuteComponents/slicedRolecomp.jsx";
 import functionsSpace from "@/features/functions/functions.jsx";
+import customFetch from "@/utilities/axios.js";
 import Select from "react-select";
+import Image from "next/image";
 import { useRouter } from "next/navigation.js";
+import TotalStudentPops, {
+  TotalTutorsProps,
+  TotalAdminProps,
+} from "../minuteComponents/sudentPops.jsx";
 import { adminUpdateUsers } from "@/features/profile/profileSlice";
 import _ from "lodash";
 
 const RoleView = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { users } = useSelector((strore) => strore.profiles);
+  // const { users } = useSelector((strore) => strore.profiles);
   const [roleCont, setRoleCont] = useState();
+  const [users, setUsers] = useState();
   const [rowId, setRowId] = useState(null);
+  const [trigger, setTrigger] = useState(false);
   const [isId, setisId] = useState(null);
 
   useEffect(() => {
-    dispatch(GetAllUsers());
-  }, []);
+    const fetchUsers = async () => {
+      try {
+        const res = await customFetch.get("/auth/users", {
+          withCredentials: true,
+          credentials: "includes",
+        });
+        //console.log(res);
+        const resp = { data: res.data.user, stats: res.status };
+        setUsers(resp.data);
+      } catch (error) {
+        return { msg: error };
+      }
+    };
+    fetchUsers();
+  }, [trigger]);
   const roleOptions = [
     { value: "1", label: "student" },
     { value: "2", label: "tutor" },
@@ -44,37 +65,29 @@ const RoleView = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // console.log(`items in container ${roleCont} ${profileParams} ${id}`);
-    // console.log(roleDisplay);
-
-    // const res = await axios.put(
-    //   "http://localhost:8000/greendometech/ng/auth/users/update/6480d2355c177a3d245857e4",
-    //   {
-    //     firstname: firstname,
-    //     lastname: lastname,
-    //     biography: biography,
-    //     certificate: certCont,
-    //     mobilenumber: mobilenumber,
-    //     country: _.toString(countryZip),
-    //     roles: roleCont,
-    //   },
-    //   {
-    //     withCredentials: true,
-    //     credentials: "include",
-    //   }
-    // );
-    // console.log(`this is rowid ${rowId}`);
-
     if (rowId === isId) {
-      dispatch(
-        adminUpdateUsers({
-          params: rowId,
-          roles: roleCont,
-        })
-      );
-      dispatch(GetAllUsers());
+      try {
+        const res = await customFetch.put(
+          `/auth/users/update/${rowId}`,
+          { roles: roleCont },
 
-      router.refresh();
+          {
+            withCredentials: true,
+            credentials: "includes",
+          }
+        );
+      } catch (error) {
+        return { msg: error };
+      }
+      setTrigger(true);
+      // dispatch(
+      //   adminUpdateUsers({
+      //     params: rowId,
+
+      //   })
+      // );
+
+      // router.refresh("panel/admin_dashboard/roleview");
     } else {
       return;
     }
@@ -84,14 +97,19 @@ const RoleView = () => {
     <section className="panel relative top-10   h-screen bg-purple">
       <div>board</div>
       <div>
-        {users.map((item, ids) => {
-          const { firstname, lastname, username, roles } = item;
+        {users?.map((item, ids) => {
+          const { firstname, lastname, username, roles, image } = item;
           const { id } = item;
           const Role = functionsSpace(roles);
 
           return (
             <section key={ids}>
               <div key={ids}>
+                <div key={ids}>
+                  {image && (
+                    <Image width={200} height={200} src={image} alt="image" />
+                  )}
+                </div>
                 user: {ids} <h2>{firstname}</h2>
                 <h2>{lastname}</h2>
                 <h2>{username}</h2>
@@ -105,14 +123,14 @@ const RoleView = () => {
                     key={ids}
                     components={makeAnimated()}
                     name="roles"
-                    // value={roles}
+                    isClearable={true}
                     options={roleOptions}
                     id="roles"
                     onChange={handleSelected}
                     isMulti={true}
                     isSearchable
                     noOptionsMessage={() => "role does not exist yet"}
-                    placeholder={_.toString(roles)}
+                    placeholder={_.toString(Role)}
                   />
                 </div>
 
@@ -123,9 +141,16 @@ const RoleView = () => {
         })}
       </div>
       <StudentsSlice />
-      {/* <div className="relative flex items-center justify-around flex-row">
-        <TotalStudentPops />
-        <ActiveStudentPops />
+      {/* <div className="relative">
+        <div className="absolute">
+          <TotalStudentPops />
+        </div>
+        <div className="absolute">
+          <TotalAdminProps />
+        </div>
+        <div className="absolute">/
+          <TotalTutorsProps />
+        </div>
       </div> */}
     </section>
   );

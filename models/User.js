@@ -43,6 +43,15 @@ const UserSchema = new mongoose.Schema(
       maxLength: 200,
       minLength: 20,
     },
+    image: {
+      type: String,
+      required: [true, "please provide image"],
+    },
+    rating: {
+      type: Number,
+      enum: [0, 1, 2, 3, 4, 5],
+      default: "0",
+    },
     certificate: {
       type: [String],
       enum: [
@@ -66,7 +75,7 @@ const UserSchema = new mongoose.Schema(
     roles: {
       type: [String],
       enum: ["company", "Admin", "tutor", "student"],
-      default: ["student"],
+      default: ["company"],
     },
     email: {
       type: String,

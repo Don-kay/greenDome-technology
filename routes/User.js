@@ -10,6 +10,7 @@ const {
   userNameLogin,
   emailLogin,
   GetAllUsers,
+  GetSingleUsers,
   UpdateProfile,
   UpdateAllProfile,
   DeleteAllProfile,
@@ -26,6 +27,13 @@ router
     Authentication,
     AuthenticateRoles(Role_List.C1856, Role_List.A3769),
     GetAllUsers
+  );
+router
+  .route("/users/:id")
+  .get(
+    Authentication,
+    AuthenticateRoles(Role_List.C1856, Role_List.A3769),
+    GetSingleUsers
   );
 router
   .route("/users/update/:id")

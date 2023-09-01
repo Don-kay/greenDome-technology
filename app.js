@@ -8,15 +8,26 @@ const session = require("express-session");
 
 const App = express();
 const mongoDBsession = require("connect-mongodb-session")(session);
+const bodyParser = require("body-parser");
+
 const cors = require("cors");
 
 const connectDB = require("./db/connect");
 
+App.use(bodyParser.json({ limit: "25mb" }));
+App.use(
+  bodyParser.urlencoded({
+    limit: "25mb",
+    extended: true,
+    parameterLimit: 50000,
+  })
+);
 //  6. import authRoute
 const AuthRouter = require("./routes/User");
 const CourseRouter = require("./routes/Course");
 const ClassRouter = require("./routes/Class");
 const CalendarRouter = require("./routes/calendar");
+const RatioRouter = require("./routes/profitRatio");
 
 const Role_List = require("./config/Roles");
 const AuthenticateRoles = require("./middleware/AuthenticateRoles");
@@ -57,6 +68,12 @@ App.use(
   Authentication,
   AuthenticateRoles(Role_List.C1856, Role_List.A3769, Role_List.T5798),
   ClassRouter
+);
+App.use(
+  "/greendometech/ng/finance",
+  Authentication,
+  AuthenticateRoles(Role_List.C1856),
+  RatioRouter
 );
 App.use(
   "/greendometech/ng/calendar",

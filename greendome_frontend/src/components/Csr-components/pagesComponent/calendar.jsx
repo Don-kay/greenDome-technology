@@ -3,10 +3,15 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import AddEventModal from "../minuteComponents/addEventModal";
 import UpdateEventModal from "../minuteComponents/updateEventModal";
+import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
 import ProfileActions from "@/features/profile/profileActions";
 import CalendarFunction from "@/features/calendar/CalendarFunction";
+import SingleEventView from "../minuteComponents/SingleEventView";
+import { ProfileModal } from "@/features/functions/functionSlice";
+import Greendome from "../../asset/greendome.jpg";
+import Image from "next/image";
 import moment from "moment";
 import axios from "axios";
 
@@ -16,6 +21,8 @@ const Calendar = () => {
   const [singleEvent, setSingleEvent] = useState("");
   const [deletedEvent, setDeletedEvent] = useState("");
   const [params, setParams] = useState("");
+  const { profileView, modalId } = useSelector((strore) => strore.functions);
+  const dispatch = useDispatch();
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const [event, setEvent] = useState([]);
@@ -27,6 +34,7 @@ const Calendar = () => {
   };
 
   useEffect(() => {
+    dispatch(ProfileModal({ bool: false }));
     try {
       const fetch = async () => {
         const response = await axios.get(
@@ -44,7 +52,7 @@ const Calendar = () => {
       };
       fetch();
     } catch (error) {
-      return { msg: error.response.data };
+      return;
     }
   }, [updateModalOpen]);
 
@@ -54,6 +62,7 @@ const Calendar = () => {
 
   const EventList = event?.map((item) => {
     return {
+      image: item.image,
       id: item._id,
       title: item.title,
       start: item.start,
@@ -61,10 +70,10 @@ const Calendar = () => {
       // uid: item.uid,
     };
   });
-  // console.log(deletedEvent);
+  // console.log(profileView);
 
   const deleteEventHandler = async (prop) => {
-    const singleEvent = EventList.filter((item) => item.id !== prop);
+    // const singleEvent = EventList.filter((item) => item.id !== prop);
     const deltd = await axios.delete(
       `http://localhost:8000/greendometech/ng/calendar/delete-events/${prop}`,
       {
@@ -88,11 +97,36 @@ const Calendar = () => {
   };
 
   const columns = useMemo(() => [
-    // { field: "img", headerName: "Image", width: 220 },
+    {
+      field: "image",
+      headerName: "Image",
+      width: 220,
+      renderCell: (params) =>
+        params.row.image === "" || params.row.image === undefined ? (
+          <Image width={200} height={200} src={Greendome} alt="image" />
+        ) : (
+          <Image width={100} height={100} src={params.row.image} alt="image" />
+        ),
+      sortable: false,
+      filterable: false,
+    },
+
     { field: "id", headerName: "Id", width: 300 },
     { field: "title", headerName: "Title", width: 300 },
-    { field: "start", headerName: "Start", width: 200 },
-    { field: "end", headerName: "End", width: 200 },
+    {
+      field: "start",
+      headerName: "Start",
+      width: 200,
+      renderCell: (params) =>
+        moment(params.row.start).format("YYYY-MM-DD HH:MM:SS"),
+    },
+    {
+      field: "end",
+      headerName: "End",
+      width: 200,
+      renderCell: (params) =>
+        moment(params.row.end).format("YYYY-MM-DD HH:MM:SS"),
+    },
     {
       field: "settings",
       headerName: "Settings",
@@ -204,10 +238,19 @@ const Calendar = () => {
                 pagination: { paginationModel: { pageSize: 10 } },
               }}
               pageSizeOptions={[5, 10, 25]}
+              getRowSpacing={(params) => ({
+                top: params.isFirstVisible ? 0 : 5,
+                bottom: params.isLastVisible ? 0 : 5,
+              })}
             />
           </Box>
         </div>
       </div>
+      {profileView && (
+        <div>
+          <SingleEventView events={event} id={modalId} />
+        </div>
+      )}
     </section>
   );
 };

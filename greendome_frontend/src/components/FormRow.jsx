@@ -3,11 +3,15 @@ const FormRow = ({
   userRef,
   name,
   value,
+  accept,
+  multiple,
   check,
   handleChange,
   labelText,
   handleOnFocus,
   handleOnBlur,
+  pattern,
+  maxLength,
 }) => {
   return (
     <div className="formrow">
@@ -18,6 +22,7 @@ const FormRow = ({
         ref={userRef}
         id={name}
         type={type}
+        accept={accept}
         placeholder={name}
         name={name}
         checked={check}
@@ -26,6 +31,9 @@ const FormRow = ({
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
         className="form-input"
+        multiple={multiple}
+        pattern={pattern}
+        maxLength={maxLength}
       />
     </div>
   );

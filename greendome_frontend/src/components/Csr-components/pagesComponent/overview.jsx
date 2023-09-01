@@ -15,8 +15,19 @@ import axios from "axios";
 const Overview = () => {
   const dispatch = useDispatch();
   const [course, setCourses] = useState([]);
-  // const { course, TotalCourse } = useSelector((strore) => strore.course);
+  const { user } = useSelector((strore) => strore.user);
+  const { users } = useSelector((state) => state.profiles);
+  const loggedInUserId = user.data.user.id;
+  const loggedInUser = users.filter((i) => i.id === loggedInUserId);
 
+  const IsStudent = loggedInUser.map((i) => {
+    return i.roles.includes("student");
+  });
+
+  const student = user.data.user;
+  const studentParams = student.id;
+
+  const isStudent = _.toString(IsStudent);
   // console.log(users);
 
   const getAllcourses = async () => {
@@ -44,18 +55,38 @@ const Overview = () => {
 
   return (
     <main className="flex h-fit justify-center bg-bubblegum gap-2 ">
-      <section className=" h-fit bg-purple p-responsive3 border-dark min-w-innerlay">
-        <RolesCharts />
-        <CourseCharts />
-        <RevenueCharts />
-        <StudentsSlice />
-      </section>
-      <section className="min-w-innerlay2 bg-red-700">
-        Calender % student rating
-        <Calender />
-        <EventsChart />
-        <RatedCourse />
-      </section>
+      {isStudent ? (
+        <section>
+          <div className=" h-fit bg-purple p-responsive3 border-dark min-w-innerlay">
+            <CourseCharts
+              course={course}
+              params={studentParams}
+              isStudent={isStudent}
+            />
+          </div>
+          <div className="min-w-innerlay2 bg-red-700">
+            Calender % student rating
+            <Calender params={studentParams} isStudent={isStudent} />
+            <EventsChart params={studentParams} isStudent={isStudent} />
+            <RatedCourse params={studentParams} isStudent={isStudent} />
+          </div>
+        </section>
+      ) : (
+        <section>
+          <div className=" h-fit bg-purple p-responsive3 border-dark min-w-innerlay">
+            <RolesCharts />
+            <CourseCharts params={studentParams} isStudent={isStudent} />
+            <RevenueCharts />
+            <StudentsSlice />
+          </div>
+          <div className="min-w-innerlay2 bg-red-700">
+            Calender % student rating
+            <Calender params={studentParams} isStudent={isStudent} />
+            <EventsChart params={studentParams} isStudent={isStudent} />
+            <RatedCourse params={studentParams} isStudent={isStudent} />
+          </div>
+        </section>
+      )}
     </main>
   );
 };

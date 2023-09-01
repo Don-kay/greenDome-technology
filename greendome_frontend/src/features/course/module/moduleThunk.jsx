@@ -25,8 +25,8 @@ export const CreateModulesThunk = async (modules, thunkApi) => {
     featured,
     status,
     level,
+    image,
     content,
-    category,
     paramId,
     paramName,
   } = modules;
@@ -40,8 +40,8 @@ export const CreateModulesThunk = async (modules, thunkApi) => {
         featured: featured,
         status: status,
         level: level,
+        image: image,
         content: content,
-        category: category,
       },
       {
         withCredentials: true,
@@ -51,10 +51,11 @@ export const CreateModulesThunk = async (modules, thunkApi) => {
     const resp = { data: res.data, stats: res.status };
     return resp;
   } catch (error) {
-    thunkApi.rejectWithValue({
-      msg: error?.response.data,
-      stats: error?.response.status,
-    });
+    return thunkApi.rejectWithValue(error?.response.data);
+    // return console.log(error?.response.data);
+    // console.log({ stats: error?.response.status}),
+
+    // stats: error?.response.status,
   }
 };
 export const getQuestionThunk = async (question, thunkApi) => {

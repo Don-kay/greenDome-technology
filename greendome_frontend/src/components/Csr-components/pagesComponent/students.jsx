@@ -8,84 +8,126 @@ import {
   setRefresh,
 } from "@/features/profile/profileSlice";
 import ProfileActions from "@/features/profile/profileActions.jsx";
+import StudentView from "./studentView.jsx";
 import TotalStudentPops, {
   ActiveStudentPops,
 } from "../minuteComponents/sudentPops.jsx";
 import _ from "lodash";
+import Greendome from "../../asset/greendome.jpg";
+import Image from "next/image";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 
 const Students = () => {
   const dispatch = useDispatch();
-  // const [users, setUsers] = useState([]);
+  const [student, setStudent] = useState([]);
+  const [studentId, setStudentId] = useState();
+  const [activeStudent, setactiveStudent] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
   const { users } = useSelector((strore) => strore.profiles);
   const [rowId, setRowId] = useState(null);
   // console.log(users);
 
-  // const fetchUsers = async () => {
-  //   try {
-  //     const profiles = await axios.get(
-  //       "http://localhost:8000/greendometech/ng/auth/users",
-  //       {
-  //         withCredentials: true,
-  //         credentials: "include",
-  //       }
-  //     );
-  //     const resp = { data: profiles.data, stats: profiles.status };
-  //     console.log(profiles);
-  //     setUsers(resp);
-  //   } catch (error) {
-  //     return { msg: error.response.data };
-  //   }
-  // };
-
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const profiles = await axios.get(
+          "http://localhost:8000/greendometech/ng/auth/users",
+          {
+            withCredentials: true,
+            credentials: "include",
+          }
+        );
+        const resp = { data: profiles.data, stats: profiles.status };
+        // console.log(resp.data.user);
+        const data = resp.data.user;
+
+        const studentObj = data.filter((item) => {
+          return item.roles.includes("student");
+        });
+        const activeStudents = data.filter((item) => {
+          return (
+            item.roles.includes("student") &&
+            (item.classesId.length !== 0 || item.classesId === undefined)
+          );
+        });
+        const students = studentObj.map((item) => {
+          return {
+            id: item.id,
+            image: item.image,
+            email: item.email,
+            username: item.username,
+            firstname: item.firstname,
+            roles: _.toString(item.roles),
+            lastname: item.lastname,
+            createdAt: item.createdAt,
+            classesId: item.classesId,
+          };
+          // item.roles, item.id;
+        });
+
+        setactiveStudent(activeStudents);
+        if (activeStudent?.length === 0) {
+          dispatch(setActiveStudent(0));
+        } else {
+          dispatch(setActiveStudent(activeStudent.length));
+        }
+
+        setStudent(students);
+        dispatch(setStudents(students.length));
+      } catch (error) {
+        return { msg: error.response.data };
+      }
+    };
+
+    fetchUsers();
     dispatch(GetAllUsers());
-  }, []);
+  }, [studentId]);
 
   // console.log(users);
   // const User = users?.data;
   // const allUsers = User?.user;
 
-  const studentObj = users.filter((item) => {
-    return item.roles.includes("student");
-  });
-  const activeStudents = users.filter((item) => {
-    return (
-      item.roles.includes("student") &&
-      (item.classesId.length !== 0 || item.classesId === undefined)
-    );
-  });
-
   // console.log(studentObj);
-  const students = studentObj.map((item) => {
-    return {
-      id: item.id,
-      email: item.email,
-      username: item.username,
-      firstname: item.firstname,
-      roles: _.toString(item.roles),
-      lastname: item.lastname,
-      createdAt: item.createdAt,
-      classesId: item.classesId,
-    };
-    // item.roles, item.id;
-  });
+
   // const studentId = studentObj.map((key) => key.id);
 
-  useEffect(() => {
-    dispatch(setStudents(students?.length));
+  const handleModalId = (id) => {
+    setStudentId(id);
+    setModalOpen(true);
+  };
 
-    if (activeStudents.length === 0) {
+  useEffect(() => {
+    dispatch(setStudents(student.length));
+
+    if (activeStudent?.length === 0) {
       dispatch(setActiveStudent(0));
     } else {
-      dispatch(setActiveStudent(activeStudents?.length));
+      dispatch(setActiveStudent(activeStudent.length));
     }
   }, [users]);
 
   const columns = useMemo(
     () => [
+      {
+        field: "image",
+        headerName: "Image",
+        width: 220,
+        renderCell: (params) =>
+          params.row.image === "" || params.row.image === undefined ? (
+            <Image width={200} height={200} src={Greendome} alt="image" />
+          ) : (
+            <Image
+              width={100}
+              height={100}
+              src={params.row.image}
+              alt="image"
+            />
+          ),
+        sortable: false,
+        filterable: false,
+      },
       { field: "id", headerName: "Id", width: 220 },
       { field: "username", headerName: "Username", width: 120 },
       { field: "firstname", headerName: "Firstname", width: 170 },
@@ -105,7 +147,13 @@ const Students = () => {
         field: "actions",
         headerName: "Actions",
         width: 220,
-        renderCell: (params) => <ProfileActions {...{ params }} />,
+        renderCell: (params) => (
+          <ProfileActions
+            {...{ params }}
+            onOpen={() => setModalOpen(true)}
+            studentId={(id) => handleModalId(id)}
+          />
+        ),
       },
     ],
     [rowId]
@@ -114,6 +162,11 @@ const Students = () => {
   return (
     <section className="panel relative top-10   h-screen bg-purple">
       <div>board</div>
+      <StudentView
+        onClosed={() => setModalOpen(false)}
+        isOpen={modalOpen}
+        studentid={studentId}
+      />
       {/* <button onClick={() => view}>view all users</button> */}
       <Box
         sx={{
@@ -130,11 +183,19 @@ const Students = () => {
         </Typography>
         <DataGrid
           columns={columns}
-          rows={students}
+          rows={student}
           getRowId={(row) => row.id}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10 } },
+          }}
+          pageSizeOptions={[5, 10, 25]}
+          getRowSpacing={(params) => ({
+            top: params.isFirstVisible ? 0 : 5,
+            bottom: params.isLastVisible ? 0 : 5,
+          })}
         />
       </Box>
-      <div className="relative flex items-center justify-around flex-row">
+      <div className="relative top-40 flex items-center justify-around flex-row">
         <TotalStudentPops />
         <ActiveStudentPops />
       </div>

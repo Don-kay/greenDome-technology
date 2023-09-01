@@ -2,7 +2,7 @@ import React from "react";
 import CreateModule from "@/components/Csr-components/pagesComponent/createModule";
 
 const Create_module = (req) => {
-  const paramId = req.params.id;
+  const courseId = req.params.id;
   const paramName = req.params.nameid;
 
   function replaceAll(string, token, newtoken) {
@@ -17,7 +17,7 @@ const Create_module = (req) => {
   // console.log(paramsName);
   return (
     <main>
-      <CreateModule paramsName={paramsName} paramsId={paramId} />
+      <CreateModule paramsName={paramsName} courseid={courseId} />
     </main>
   );
 };

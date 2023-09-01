@@ -12,6 +12,7 @@ const ViewProfile = ({ params }) => {
   // console.log(studentId);
   const dispatch = useDispatch();
   const attendeesId = params.id;
+  // console.log(params.id);
 
   const displayProfile = (attendeesId) => {
     dispatch(ProfileModal({ id: attendeesId, bool: true }));

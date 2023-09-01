@@ -13,11 +13,16 @@ const classSchema = new mongoose.Schema(
       type: String,
       ref: "User",
       required: [true, "Please provide user"],
+      trim: true,
     },
     fee: {
       type: Number,
       minLength: [3, "figure musnt be less than 3 digits"],
       required: [true, "please attach a fee"],
+      trim: true,
+    },
+    profit: {
+      type: Number,
     },
     year: {
       type: Date,
@@ -28,55 +33,25 @@ const classSchema = new mongoose.Schema(
       required: [true, "please provide course description"],
       maxLength: 100,
       minLength: 10,
+      trim: true,
     },
-    content: {
+    image: {
       type: String,
-      required: [true, "please provide a minium of 5 contents"],
-      maxLength: 100,
+      required: [true, "please provide image"],
     },
-    content1: {
-      type: String,
-      required: [true, "please provide a minium of 5 contents"],
-      maxLength: 100,
-    },
-    content2: {
-      type: String,
-      required: [true, "please provide a minium of 5 contents"],
-      maxLength: 100,
-    },
-    content3: {
-      type: String,
-      required: [true, "please provide a minium of 5 contents"],
-      maxLength: 100,
-    },
-    content4: {
-      type: String,
-      required: [true, "please provide a minium of 5 contents"],
-      maxLength: 100,
-    },
-    content5: {
-      type: String,
-      maxLength: 100,
-    },
-    content6: {
-      type: String,
-      maxLength: 100,
-    },
-    content7: {
-      type: String,
-      maxLength: 100,
-    },
-    content8: {
-      type: String,
-      maxLength: 100,
-    },
-    content9: {
-      type: String,
-      maxLength: 100,
-    },
-    content10: {
-      type: String,
-      maxLength: 100,
+    category: {
+      type: [String],
+      enum: [
+        "none",
+        "machine learning",
+        "html",
+        "css",
+        "node.js",
+        "react js",
+        "full stack development",
+        "UI/UX",
+      ],
+      default: [],
     },
     party_type: {
       type: [String],
@@ -87,21 +62,23 @@ const classSchema = new mongoose.Schema(
     },
     Serial_key: {
       type: String,
-      required: [true, "please provide class code"],
+      required: [true, "please provide course code"],
       unique: [true, "please provide another value"],
       maxLength: 15,
       minLength: 9,
+      trim: true,
     },
     createdBy: {
       type: mongoose.Types.ObjectId, //THIS points to the associated userid coming from authorization token
       ref: "User", //reference the User model
       required: [true, "Please provide user"],
+      trim: true,
     },
     assigned_tutor: {
-      type: [mongoose.Types.ObjectId], //THIS points to the associated userid coming from authorization token
-      ref: "User", //reference the User model
+      type: [String], //THIS points to the associated userid coming from authorization token
+      // ref: "User", //reference the User model
       default: [],
-      required: [true, "Please provide user"],
+      // required: [true, "Please provide user"],
     },
   },
   { timestamps: true }

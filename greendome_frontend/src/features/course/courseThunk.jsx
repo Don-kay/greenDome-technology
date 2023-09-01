@@ -2,7 +2,7 @@ import customFetch from "@/utilities/axios";
 
 export const AllCoursesThunk = async (_, thunkApi) => {
   try {
-    const res = await customFetch.get("/classes/admin/view-all-classes", {
+    const res = await customFetch.get("/course/admin/view-all-course", {
       withCredentials: true,
       credentials: "includes",
     });
@@ -22,6 +22,7 @@ export const CreateCoursesThunk = async (course, thunkApi) => {
       withCredentials: true,
       credentials: "includes",
     });
+    console.log(res);
     const resp = { data: res.data, stats: res.status };
     return resp;
   } catch (error) {

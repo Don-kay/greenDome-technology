@@ -8,6 +8,9 @@ const QuestionSchema = new mongoose.Schema(
       maxlength: 1000,
       trim: true,
     },
+    image: {
+      type: String,
+    },
     option1: {
       type: String,
       minlength: 1,
@@ -45,12 +48,20 @@ const QuestionSchema = new mongoose.Schema(
     },
     moduleName: {
       type: String,
-      ref: "class",
+      ref: "course",
     },
     moduleId: {
       type: mongoose.Types.ObjectId,
       ref: "course",
       required: [true, "please provide course"],
+    },
+    className: {
+      type: String,
+      ref: "class",
+    },
+    classId: {
+      type: mongoose.Types.ObjectId,
+      ref: "class",
     },
   },
   {

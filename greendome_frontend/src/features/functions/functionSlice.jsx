@@ -8,6 +8,10 @@ const initialState = {
   adminView: false,
   profileView: false,
   modalId: "",
+  ishover: false,
+  triggers: false,
+  triggers2: false,
+  isdelete: false,
 };
 
 const functionSlice = createSlice({
@@ -39,6 +43,18 @@ const functionSlice = createSlice({
       state.profileView = action.payload.bool;
       state.modalId = action.payload.id;
     },
+    HoverModal: (state, action) => {
+      state.ishover = action.payload;
+    },
+    HoverDelete: (state, action) => {
+      state.isdelete = action.payload;
+    },
+    ToggleTrigger: (state) => {
+      state.triggers = !state.triggers;
+    },
+    ToggleTrigger2: (state) => {
+      state.triggers2 = !state.triggers2;
+    },
   },
 });
 
@@ -49,6 +65,10 @@ export const {
   displayAdmin,
   displayStudents,
   ProfileModal,
+  HoverModal,
+  HoverDelete,
+  ToggleTrigger,
+  ToggleTrigger2,
 } = functionSlice.actions;
 
 export default functionSlice.reducer;

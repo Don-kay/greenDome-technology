@@ -11,7 +11,7 @@ const CourseSchema = new mongoose.Schema(
     description: {
       type: String,
       required: [true, "please provide course description"],
-      maxLength: 100,
+      maxLength: 600,
       minLength: 10,
     },
     content: {
@@ -24,10 +24,14 @@ const CourseSchema = new mongoose.Schema(
       maxLength: 50,
     },
     code: {
-      type: Number,
+      type: String,
       required: [true, "please provide course code"],
       unique: [true, "please provide another value"],
-      maxLength: 5,
+      maxLength: 10,
+      trim: true,
+    },
+    image: {
+      type: String,
     },
     status: {
       type: String,
@@ -41,20 +45,7 @@ const CourseSchema = new mongoose.Schema(
       // enum: ["company", "tutor", "student"],
       // default: "student",
     },
-    category: {
-      type: [String],
-      enum: [
-        "none",
-        "machine learning",
-        "html",
-        "css",
-        "node.js",
-        "react js",
-        "full stack development",
-        "UI/UX",
-      ],
-      default: "none",
-    },
+
     // fee: {
     //   type: Number,
     //   required: [true, "please provide products price"],

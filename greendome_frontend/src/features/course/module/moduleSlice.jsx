@@ -8,11 +8,14 @@ import {
 
 const initialState = {
   module: "",
+  moduleStats: "",
   isLoading: false,
   TotalCourse: 0,
   ratedCourse: "",
   singleQuestion: "",
   allQuestions: "",
+  errorMsg: "",
+  successMsg: "",
 };
 
 export const GetCourseModules = createAsyncThunk("modules/coursemodules");
@@ -46,6 +49,12 @@ const moduleSlice = createSlice({
     setCourseModule: (state, action) => {
       state.TotalCourse = action.payload;
     },
+    resetErrorMsg: (state, action) => {
+      state.errorMsg = action.payload;
+    },
+    resetModule: (state, action) => {
+      state.module = action.payload;
+    },
   },
 
   extraReducers: {
@@ -72,14 +81,17 @@ const moduleSlice = createSlice({
     [createModules.fulfilled]: (state, action) => {
       const { payload } = action;
       console.log(payload);
-      state.module = payload?.data.course;
+      state.module = payload?.data.modules;
+      state.moduleStats = payload?.stats;
       // state.TotalCourse = payload.data.count;
       state.isLoading = false;
+      // state.successMsg = payload;
     },
     [createModules.rejected]: (state, action) => {
       const { payload } = action;
       console.log(payload);
       state.isLoading = true;
+      state.errorMsg = payload;
     },
     [createQuestions.pending]: (state, action) => {
       const { payload } = action;
@@ -92,11 +104,13 @@ const moduleSlice = createSlice({
       state.singleQuestion = payload?.data.question;
       // state.TotalCourse = payload.data.count;
       state.isLoading = false;
+      state.successMsg = payload;
     },
     [createQuestions.rejected]: (state, action) => {
       const { payload } = action;
       console.log(payload);
       state.isLoading = true;
+      state.errorMsg = payload;
     },
     [getQuestions.pending]: (state, action) => {
       const { payload } = action;
@@ -118,6 +132,7 @@ const moduleSlice = createSlice({
   },
 });
 
-export const { setTotalModule } = moduleSlice.actions;
+export const { setTotalModule, resetErrorMsg, resetModule } =
+  moduleSlice.actions;
 
 export default moduleSlice.reducer;

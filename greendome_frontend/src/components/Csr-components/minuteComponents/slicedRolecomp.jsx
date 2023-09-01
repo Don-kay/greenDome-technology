@@ -17,7 +17,11 @@ import ProfileActions from "@/features/profile/profileActions.jsx";
 import _ from "lodash";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import TotalSudentPops, { ActiveStudentPops } from "./sudentPops";
+import TotalStudentPops, {
+  TotalTutorsProps,
+  TotalAdminProps,
+  ActiveStudentPops,
+} from "./sudentPops";
 
 const StudentsSlice = () => {
   const dispatch = useDispatch();
@@ -152,10 +156,12 @@ const StudentsSlice = () => {
 
   return (
     <section className="panel relative p-responsive2 h-fit bg-amber-400">
-      <button onClick={() => dispatch(displayStudents())}>student</button>
-      <button onClick={() => dispatch(displayAdmin())}>admin</button>
-      <button onClick={() => dispatch(displayTutor())}>tutor</button>
-      <div>board</div>
+      <div className=" flex justify-center items-center gap-20 flex-row p-responsive2">
+        <button onClick={() => dispatch(displayStudents())}>student</button>
+        <button onClick={() => dispatch(displayAdmin())}>admin</button>
+        <button onClick={() => dispatch(displayTutor())}>tutor</button>
+        <div>board</div>
+      </div>
       <div className=" flex justify-center items-center gap-20 flex-row p-responsive2">
         <div className=" flex justify-center items-center p-responsive2 h-fit bg-lime-600 max-w-overviewLayer">
           {tutorView ? (
@@ -220,11 +226,23 @@ const StudentsSlice = () => {
             </Box>
           )}
         </div>
-        <div>
-          <TotalSudentPops />
-          <ActiveStudentPops />
+        <div className="relative max-w-overviewLayer">
+          {tutorView ? (
+            <div className="absolute">
+              <TotalTutorsProps />
+            </div>
+          ) : adminView ? (
+            <div className="absolute">
+              <TotalAdminProps />
+            </div>
+          ) : (
+            <div className="absolute">
+              <TotalStudentPops />
+            </div>
+          )}
         </div>
       </div>
+      {/* <ActiveStudentPops /> */}
     </section>
   );
 };
