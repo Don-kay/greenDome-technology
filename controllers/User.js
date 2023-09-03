@@ -256,7 +256,7 @@ const UpdateProfile = async (req, res) => {
   } = req;
   const { email } = foundUser;
 
-  if (firstname === " " || lastname === " " || roles === " ") {
+  if (firstname === "" || lastname === "" || roles === "") {
     res.status(StatusCodes.NOT_ACCEPTABLE).send(`fields cannot be empty  `);
   }
 

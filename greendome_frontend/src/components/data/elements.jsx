@@ -107,20 +107,20 @@ export const SidebarEl = [
         title: "Create Course",
         urls: "/panel/admin_dashboard/create-course",
       },
+      // {
+      //   id: 2,
+      //   title: "Create Modules",
+      //   urls: "/panel/admin_dashboard/create-module=",
+      // },
       {
         id: 2,
-        title: "Create Modules",
-        urls: "/panel/admin_dashboard/create-module",
-      },
-      {
-        id: 3,
-        title: "View Modules",
+        title: "Manage Course",
         urls: "/panel/admin_dashboard/view-module",
       },
     ],
   },
   {
-    id: 6,
+    id: 5,
     title: "Role View",
     icon: <FaHouseUser />,
     pages: [
@@ -136,7 +136,7 @@ export const SidebarEl = [
     ],
   },
   {
-    id: 7,
+    id: 6,
     title: "Demography",
     icon: <GoGraph />,
     pages: [
@@ -174,13 +174,13 @@ export const SidebarEl = [
       },
     ],
   },
+  // {
+  //   id: 7,
+  //   title: "Settings",
+  //   icon: <BsCalendar3 />,
+  // },
   {
-    id: 8,
-    title: "Events Tracker",
-    icon: <BsCalendar3 />,
-  },
-  {
-    id: 9,
+    id: 7,
     title: "Role Types",
     icon: <FaUsersCog />,
     urls: "/panel/admin_dashboard/roleview",

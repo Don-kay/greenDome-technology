@@ -18,6 +18,7 @@ import Image from "next/image";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
+import moment from "moment";
 
 const Students = () => {
   const dispatch = useDispatch();
@@ -62,6 +63,7 @@ const Students = () => {
             roles: _.toString(item.roles),
             lastname: item.lastname,
             createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
             classesId: item.classesId,
           };
           // item.roles, item.id;
@@ -142,7 +144,20 @@ const Students = () => {
           return role;
         },
       },
-      { field: "createdAt", headerName: "Created At", width: 220 },
+      {
+        field: "createdAt",
+        headerName: "Created At",
+        width: 220,
+        renderCell: (params) =>
+          moment(params.row.createdAt).format("YYYY-MM-DD HH:MM:SS"),
+      },
+      {
+        field: "updatedAt",
+        headerName: "updated At",
+        width: 220,
+        renderCell: (params) =>
+          moment(params.row.updatedAt).format("YYYY-MM-DD HH:MM:SS"),
+      },
       {
         field: "actions",
         headerName: "Actions",

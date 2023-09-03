@@ -2,18 +2,25 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GetAllUsers, setTutors } from "@/features/profile/profileSlice";
-import ProfileActions from "@/features/profile/profileActions.jsx";
+import TutorProfileActions from "@/features/profile/tutorprofileActions.jsx";
 import { TotalTutorsProps } from "../minuteComponents/sudentPops.jsx";
+import Greendome from "../../asset/greendome.jpg";
+import Image from "next/image";
+import StudentView from "./studentView.jsx";
 import _ from "lodash";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
+import moment from "moment";
 
 const Tutors = () => {
   const dispatch = useDispatch();
   const [tutor, setTutor] = useState([]);
+  const [tutorsId, setTutorsId] = useState();
   const { users } = useSelector((strore) => strore.profiles);
   const [rowId, setRowId] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeStudent, setactiveStudent] = useState([]);
   // console.log(users);
 
   useEffect(() => {
@@ -36,12 +43,14 @@ const Tutors = () => {
         const tutors = tutorObj.map((item) => {
           return {
             id: item.id,
+            image: item.image,
             email: item.email,
             username: item.username,
             firstname: item.firstname,
             roles: _.toString(item.roles),
             lastname: item.lastname,
             createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
             classesId: item.classesId,
           };
           // item.roles, item.id;
@@ -64,6 +73,11 @@ const Tutors = () => {
 
   // console.log(studentObj);
 
+  const handleModalId = (id) => {
+    setTutorsId(id);
+    setModalOpen(true);
+  };
+
   // const studentId = studentObj.map((key) => key.id);
 
   useEffect(() => {
@@ -72,6 +86,24 @@ const Tutors = () => {
 
   const columns = useMemo(
     () => [
+      {
+        field: "image",
+        headerName: "Image",
+        width: 220,
+        renderCell: (params) =>
+          params.row.image === "" || params.row.image === undefined ? (
+            <Image width={200} height={200} src={Greendome} alt="image" />
+          ) : (
+            <Image
+              width={100}
+              height={100}
+              src={params.row.image}
+              alt="image"
+            />
+          ),
+        sortable: false,
+        filterable: false,
+      },
       { field: "id", headerName: "Id", width: 220 },
       { field: "username", headerName: "Username", width: 120 },
       { field: "firstname", headerName: "Firstname", width: 170 },
@@ -86,12 +118,31 @@ const Tutors = () => {
           return role;
         },
       },
-      { field: "createdAt", headerName: "Created At", width: 220 },
+      {
+        field: "createdAt",
+        headerName: "created At",
+        width: 220,
+        renderCell: (params) =>
+          moment(params.row.createdAt).format("YYYY-MM-DD HH:MM:SS"),
+      },
+      {
+        field: "updatedAt",
+        headerName: "updated At",
+        width: 220,
+        renderCell: (params) =>
+          moment(params.row.updatedAt).format("YYYY-MM-DD HH:MM:SS"),
+      },
       {
         field: "actions",
         headerName: "Actions",
         width: 220,
-        renderCell: (params) => <ProfileActions {...{ params }} />,
+        renderCell: (params) => (
+          <TutorProfileActions
+            {...{ params }}
+            onOpen={() => setModalOpen(true)}
+            studentId={(id) => handleModalId(id)}
+          />
+        ),
       },
     ],
     [rowId]
@@ -101,6 +152,11 @@ const Tutors = () => {
     <section className="panel relative top-10   h-screen bg-purple">
       <div>board</div>
       {/* <button onClick={() => view}>view all users</button> */}
+      <StudentView
+        onClosed={() => setModalOpen(false)}
+        isOpen={modalOpen}
+        studentid={tutorsId}
+      />
       <Box
         sx={{
           height: 400,
@@ -114,7 +170,19 @@ const Tutors = () => {
         >
           manage tutors
         </Typography>
-        <DataGrid columns={columns} rows={tutor} getRowId={(row) => row.id} />
+        <DataGrid
+          columns={columns}
+          rows={tutor}
+          getRowId={(row) => row.id}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10 } },
+          }}
+          pageSizeOptions={[5, 10, 25]}
+          getRowSpacing={(params) => ({
+            top: params.isFirstVisible ? 0 : 5,
+            bottom: params.isLastVisible ? 0 : 5,
+          })}
+        />
       </Box>
       <div className="relative top-40 flex items-center justify-around flex-row">
         <TotalTutorsProps />

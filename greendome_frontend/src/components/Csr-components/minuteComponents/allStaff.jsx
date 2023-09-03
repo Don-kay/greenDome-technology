@@ -24,7 +24,7 @@ const AllStaff = () => {
   const [rowId, setRowId] = useState(null);
 
   const staffObj = users?.filter((item) => {
-    return !item.roles.includes("Admin");
+    return item.roles.includes("Admin");
   });
 
   const allAttendees = staffObj?.map((item) => {
@@ -104,10 +104,14 @@ const AllStaff = () => {
             columns={columns}
             rows={allAttendees}
             getRowId={(row) => row.id}
+            pagination={true}
+            {...columns}
+            initialState={{
+              ...columns.initialState,
+              pagination: { paginationModel: { pageSize: 5 } },
+            }}
             pageSizeOptions={[5, 10, 20]}
-            paginationModel={pageSize}
-            paginationMode="server"
-            onPaginationModelChange={(newPageSize) => setpageSize(newPageSize)}
+            // paginationMode="server"
             getRowSpacing={(params) => ({
               top: params.isFirstVisible ? 0 : 5,
               bottom: params.isLastVisible ? 0 : 5,
@@ -119,7 +123,7 @@ const AllStaff = () => {
       </Box>
       {profileView && (
         <div>
-          <SingleProfileView />
+          <SingleProfileView users={users} id={modalId} />
         </div>
       )}
     </section>

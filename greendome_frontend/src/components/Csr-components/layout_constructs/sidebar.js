@@ -344,17 +344,19 @@ const Sidebar = ({ IsAdmin, IsStudent }) => {
           }
         >
           <div className="mr-6">
-            <AiFillSetting onClick={() => openMenu()} />
-          </div>
-          <h3
-            className={
-              isSideBarOpen
-                ? " text-white text-17 tracking-wider font-medium"
-                : " text-white opacity-0 text-17 tracking-wider font-medium"
-            }
-          >
-            Settings
-          </h3>
+            <AiFillSetting />
+          </div>{" "}
+          <Link href={`/panel/settings/${Params}`}>
+            <h3
+              className={
+                isSideBarOpen
+                  ? " text-white text-17 tracking-wider font-medium"
+                  : " text-white opacity-0 text-17 tracking-wider font-medium"
+              }
+            >
+              Settings
+            </h3>
+          </Link>
         </div>
       </section>
     </main>

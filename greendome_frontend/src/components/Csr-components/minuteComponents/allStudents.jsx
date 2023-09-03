@@ -118,12 +118,16 @@ const AllStudent = () => {
         {users.length !== 0 ? (
           <DataGrid
             columns={columns}
-            rows={allAttendees}
+            rows={allStudents}
             getRowId={(row) => row.id}
+            pagination={true}
+            {...columns}
+            initialState={{
+              ...columns.initialState,
+              pagination: { paginationModel: { pageSize: 5 } },
+            }}
             pageSizeOptions={[5, 10, 20]}
-            paginationModel={pageSize}
-            paginationMode="server"
-            onPaginationModelChange={(newPageSize) => setpageSize(newPageSize)}
+            // paginationMode="server"
             getRowSpacing={(params) => ({
               top: params.isFirstVisible ? 0 : 5,
               bottom: params.isLastVisible ? 0 : 5,
@@ -135,7 +139,7 @@ const AllStudent = () => {
       </Box>
       {profileView && (
         <div>
-          <SingleProfileView />
+          <SingleProfileView users={users} id={modalId} />
         </div>
       )}
     </section>

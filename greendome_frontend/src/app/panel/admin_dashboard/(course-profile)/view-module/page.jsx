@@ -1,6 +1,8 @@
 import React from "react";
 import axios from "axios";
 import { cookies } from "next/headers";
+import Image from "next/image";
+import Greendome from "../../../../../components/asset/greendome.jpg";
 import Link from "next/link";
 import _ from "lodash";
 
@@ -39,7 +41,8 @@ const AllCourseDisp = async () => {
       <section>
         <div>
           {data?.map((item, id) => {
-            const { _id, name } = item;
+            const { _id, name, Serial_key, image } = item;
+            const imageType = image === "" || image === undefined ? "" : image;
             return (
               <div key={id}>
                 <Link key={id} href={`${url}/${name}/${_id}`}>
@@ -47,6 +50,16 @@ const AllCourseDisp = async () => {
                     key={id}
                     className=" flex justify-center items-center flex-row"
                   >
+                    {imageType !== "" ? (
+                      <Image width={200} height={200} src={image} alt="image" />
+                    ) : (
+                      <Image
+                        width={200}
+                        height={200}
+                        src={Greendome}
+                        alt="image"
+                      />
+                    )}
                     <h2>{item.name}</h2>
                     <h4>{item.Serial_key}</h4>
                   </div>

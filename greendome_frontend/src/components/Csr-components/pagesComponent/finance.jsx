@@ -93,9 +93,10 @@ const Finance = () => {
     fetchCourses();
     dispatch(GetAllUsers());
   }, []);
-
+  //classes
   const userClassDisp = Users.map((item, id) => {
     const userClasses = item.classesId;
+    //get full course detail from array of ids
     const userClass = userClasses.map((it) =>
       classes.filter((i) => it.includes(i._id))
     );

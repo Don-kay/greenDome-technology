@@ -12,7 +12,7 @@ import UpdateDropDown from "../minuteComponents/updateDropDown";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 
-function EditCourse({ courseParam, isOpen, onClosed, courses, setCourse }) {
+function EditCourse({ courseParam, isOpen, onClosed, setCourse }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalOpen, setModalOpen] = useState(false);
