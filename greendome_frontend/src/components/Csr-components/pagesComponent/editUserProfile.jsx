@@ -84,7 +84,7 @@ function EditUserProfile({
   // console.log(flattenRoles);
   const imgs = image === "undefined" || image === "" ? "" : image;
 
-  const [roleCont, setRoleCont] = useState(flattenRoles);
+  const [roleCont, setRoleCont] = useState(flattenRoles?.sort());
   const [file, setFile] = useState(imgs);
   const [certCont, setCertCont] = useState();
   const [img, setImg] = useState(false);
@@ -112,7 +112,7 @@ function EditUserProfile({
     { value: "6", label: "363" },
   ];
   useEffect(() => {
-    setRoleCont(flattenRoles);
+    setRoleCont(flattenRoles?.sort());
     setCountryZip(country);
     setCertCont(flattenCert);
 
@@ -195,7 +195,7 @@ function EditUserProfile({
   };
   const handleSelected = (selectedOptions) => {
     const label = selectedOptions.map((i) => i.label);
-    setRoleCont(label);
+    setRoleCont(label.sort());
   };
   const handleSelectedCert = (selectedOptions) => {
     const label = selectedOptions.map((i) => i.label);

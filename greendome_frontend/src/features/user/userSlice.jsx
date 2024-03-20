@@ -5,7 +5,7 @@ import { addUserLocalStorage } from "../../utilities/localStorage";
 
 // const { setToken, setStatus, setRole } = useGlobalContext();
 const initialState = {
-  isLoading: true,
+  isLoading: false,
   successMsg: "",
   user: "",
   role: [],
@@ -23,10 +23,16 @@ export const registerUser = createAsyncThunk(
     return registerUserThunk("/auth/register", user, thunkApi);
   }
 );
-export const loginUser = createAsyncThunk(
+export const loginUserEmail = createAsyncThunk(
   "user/loginUser",
   async (user, thunkApi) => {
     return loginUserThunk("/auth/login/email", user, thunkApi);
+  }
+);
+export const loginUsername = createAsyncThunk(
+  "user/loginUser",
+  async (user, thunkApi) => {
+    return loginUserThunk("/auth/login/username", user, thunkApi);
   }
 );
 
@@ -37,6 +43,9 @@ const userSlice = createSlice({
   reducers: {
     setRole: (state, action) => {
       state.role = action.payload;
+    },
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
     },
   },
 
@@ -58,10 +67,10 @@ const userSlice = createSlice({
       state.isLoading = false;
       toast.error(payload);
     },
-    [loginUser.pending]: (state) => {
+    [loginUserEmail.pending]: (state) => {
       state.isLoading = true;
     },
-    [loginUser.fulfilled]: (state, action) => {
+    [loginUserEmail.fulfilled]: (state, action) => {
       const { payload } = action;
       console.log(payload);
       const data = { data: payload.data, stats: payload.stats };
@@ -72,7 +81,30 @@ const userSlice = createSlice({
       // addUserLocalStorage(data);
       toast.success(`Welcome Back ${name}`);
     },
-    [loginUser.rejected]: (state, action) => {
+    [loginUserEmail.rejected]: (state, action) => {
+      const { payload } = action;
+      console.log(payload);
+      state.isLoading = false;
+      state.errorMsg = payload?.msg;
+      state.status = payload?.stats;
+      // state.user = payload.response.data;
+      toast.error(payload);
+    },
+    [loginUsername.pending]: (state) => {
+      state.isLoading = true;
+    },
+    [loginUsername.fulfilled]: (state, action) => {
+      const { payload } = action;
+      console.log(payload);
+      const data = { data: payload.data, stats: payload.stats };
+      state.user = data;
+      state.status = data.stats;
+      //paload is grabbing data from the res.data endpoint
+      state.isLoading = false;
+      // addUserLocalStorage(data);
+      toast.success(`Welcome Back ${name}`);
+    },
+    [loginUsername.rejected]: (state, action) => {
       const { payload } = action;
       console.log(payload);
       state.isLoading = false;
@@ -84,6 +116,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setRole } = userSlice.actions;
+export const { setRole, setLoading } = userSlice.actions;
 
 export default userSlice.reducer;

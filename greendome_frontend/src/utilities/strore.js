@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userSlice from "../features/user/userSlice";
-import functionSlice from "@/features/functions/functionSlice";
-import courseSlice from "@/features/course/courseSlice";
-import profileSlice from "@/features/profile/profileSlice";
-import moduleSlice from "@/features/course/module/moduleSlice";
-import percentageSlice from "@/features/course/percentage/percentageSlice";
+import functionSlice from "../features/functions/functionSlice";
+import courseSlice from "../features/course/courseSlice";
+import profileSlice from "../features/profile/profileSlice";
+import moduleSlice from "../features/course/module/moduleSlice";
+import percentageSlice from "../features/course/percentage/percentageSlice";
 import storage from "redux-persist/lib/storage";
 import {
   persistReducer,

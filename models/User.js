@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema(
     },
     biography: {
       type: String,
-      maxLength: 200,
+      //maxLength: 200,
       minLength: 20,
     },
     image: {
@@ -120,6 +120,19 @@ UserSchema.methods.CreateJwt = function () {
     },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_LIFETIME }
+  );
+};
+UserSchema.methods.LogoutJwt = function () {
+  //trying to sign the coming user details(_id and name) with jwt and also create a token
+  return jwt.sign(
+    {
+      userId: this._id,
+      username: this.username,
+      firstname: this.firstname,
+      roles: this.roles,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_LOGOUT }
   );
 };
 UserSchema.methods.comparePasswords = async function (Pwd) {

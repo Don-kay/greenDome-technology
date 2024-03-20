@@ -1,15 +1,17 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAllUsers } from "@/features/profile/profileSlice";
+
+import { GetAllUsers } from "../../../features/profile/profileSlice";
 import _ from "lodash";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import customFetch from "@/utilities/axios.js";
+
+import customFetch from "../../../utilities/axios.js";
 import Image from "next/image";
 import moment from "moment";
-import ViewProfile from "@/features/profile/viewProfile";
-import { ProfileModal } from "@/features/functions/functionSlice";
+import ViewProfile from "../../../features/profile/viewProfile";
+import { ProfileModal } from "../../../features/functions/functionSlice";
 import SingleProfileView from "./SingleProfileView";
 
 const AllStudent = () => {

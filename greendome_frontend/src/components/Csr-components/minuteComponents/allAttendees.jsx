@@ -1,14 +1,15 @@
 "use client";
+
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAllUsers } from "@/features/profile/profileSlice";
+import { GetAllUsers } from "../../../features/profile/profileSlice";
 import _ from "lodash";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import ViewProfile from "@/features/profile/viewProfile";
+import ViewProfile from "../../../features/profile/viewProfile";
 import Image from "next/image";
-import customFetch from "@/utilities/axios.js";
-import { ProfileModal } from "@/features/functions/functionSlice";
+import customFetch from "../../../utilities/axios.js";
+import { ProfileModal } from "../../../features/functions/functionSlice";
 import SingleProfileView from "./SingleProfileView";
 import moment from "moment";
 
@@ -101,11 +102,11 @@ const AllAttendees = () => {
     [rowId]
   );
   return (
-    <section>
+    <section className="  ">
       <div>All Attendees</div>
       <Box
         sx={{
-          height: 400,
+          height: 500,
           width: "100%",
         }}
       >
@@ -120,14 +121,16 @@ const AllAttendees = () => {
           <DataGrid
             columns={columns}
             rows={allAttendees}
+            className=" mt-5 p-8"
             getRowId={(row) => row.id}
             pagination={true}
             {...columns}
             initialState={{
               ...columns.initialState,
+
               pagination: { paginationModel: { pageSize: 5 } },
             }}
-            pageSizeOptions={[5, 10, 20]}
+            pageSizeOptions={[10, 20]}
             // paginationMode="server"
             getRowSpacing={(params) => ({
               top: params.isFirstVisible ? 0 : 5,
@@ -139,7 +142,7 @@ const AllAttendees = () => {
         )}
       </Box>
       {profileView && (
-        <div>
+        <div className="">
           <SingleProfileView users={users} id={modalId} />
         </div>
       )}

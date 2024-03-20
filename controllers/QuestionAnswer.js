@@ -131,6 +131,8 @@ const UpdateUserQuestion = async (req, res) => {
   ) {
     throw new BadRequestError(" No field can be empty");
   }
+
+  req.body.className = course.className;
   const questions = await Question.findOneAndUpdate(
     {
       _id: questionId,

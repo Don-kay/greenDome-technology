@@ -7,15 +7,16 @@ import {
   setActiveStudent,
   setTutors,
   setAdmin,
-} from "@/features/profile/profileSlice";
+} from "../../../features/profile/profileSlice";
 import {
   displayTutor,
   displayAdmin,
   displayStudents,
-} from "@/features/functions/functionSlice";
-import ProfileActions from "@/features/profile/profileActions.jsx";
+} from "../../../features/functions/functionSlice";
+import ProfileActions from "../../../features/profile/profileActions.jsx";
 import _ from "lodash";
 import { Box, Typography } from "@mui/material";
+import PageTitle from "../../typography/PageTitle";
 import { DataGrid } from "@mui/x-data-grid";
 import TotalStudentPops, {
   TotalTutorsProps,
@@ -23,12 +24,21 @@ import TotalStudentPops, {
   ActiveStudentPops,
 } from "./sudentPops";
 
-const StudentsSlice = () => {
+const StudentsSlice = ({ trigger }) => {
   const dispatch = useDispatch();
   const { studentView, tutorView, adminView } = useSelector(
     (strore) => strore.functions
   );
   const { users, errorMsg } = useSelector((strore) => strore.profiles);
+  const { user } = useSelector((strore) => strore.user);
+  const loggedInUserId = user.data.user.id;
+  const loggedInUser = users?.filter((i) => i.id === loggedInUserId);
+
+  const Admin = loggedInUser?.map((i) => {
+    return i.roles.includes("Admin");
+  });
+
+  const IsAdmin = _.toString(Admin);
 
   const [rowId, setRowId] = useState(null);
   const [roleView, setRoleView] = useState({
@@ -55,25 +65,25 @@ const StudentsSlice = () => {
   // };
   useEffect(() => {
     dispatch(GetAllUsers());
-  }, []);
+  }, [trigger]);
 
-  const studentObj = users.filter((item) => {
+  const studentObj = users?.filter((item) => {
     return item.roles.includes("student");
   });
-  const tutorObj = users.filter((item) => {
+  const tutorObj = users?.filter((item) => {
     return item.roles.includes("tutor");
   });
-  const adminObj = users.filter((item) => {
+  const adminObj = users?.filter((item) => {
     return item.roles.includes("Admin");
   });
-  const activeStudents = users.filter((item) => {
+  const activeStudents = users?.filter((item) => {
     return (
       item.roles.includes("student") &&
       (item.classesId.length !== 0 || item.classesId === undefined)
     );
   });
 
-  const students = studentObj.map((item) => {
+  const students = studentObj?.map((item) => {
     return {
       id: item.id,
       email: item.email,
@@ -86,7 +96,7 @@ const StudentsSlice = () => {
     };
     // item.roles, item.id;
   });
-  const tutor = tutorObj.map((item) => {
+  const tutor = tutorObj?.map((item) => {
     return {
       id: item.id,
       email: item.email,
@@ -99,7 +109,7 @@ const StudentsSlice = () => {
     };
     // item.roles, item.id;
   });
-  const admin = adminObj.map((item) => {
+  const admin = adminObj?.map((item) => {
     return {
       id: item.id,
       email: item.email,
@@ -116,14 +126,14 @@ const StudentsSlice = () => {
   // console.log(studentId);
 
   useEffect(() => {
-    dispatch(setStudents(students.length));
-    dispatch(setTutors(tutorObj.length));
-    dispatch(setAdmin(adminObj.length));
+    dispatch(setStudents(students?.length));
+    dispatch(setTutors(tutorObj?.length));
+    dispatch(setAdmin(adminObj?.length));
 
-    if (activeStudents.length === 0) {
+    if (activeStudents?.length === 0) {
       dispatch(setActiveStudent(0));
     } else {
-      dispatch(setActiveStudent(activeStudents.length));
+      dispatch(setActiveStudent(activeStudents?.length));
     }
   }, [users]);
 
@@ -148,27 +158,70 @@ const StudentsSlice = () => {
         field: "actions",
         headerName: "Actions",
         width: 220,
-        renderCell: (params) => <ProfileActions {...{ params }} />,
+        renderCell: (params) => (
+          <ProfileActions isAdmin={IsAdmin} {...{ params }} />
+        ),
       },
     ],
     [rowId]
   );
 
   return (
-    <section className="panel relative p-responsive2 h-fit bg-amber-400">
+    <section className="panel flex items-center flex-col relative w-full h-fit">
+      <PageTitle>board</PageTitle>
       <div className=" flex justify-center items-center gap-20 flex-row p-responsive2">
-        <button onClick={() => dispatch(displayStudents())}>student</button>
-        <button onClick={() => dispatch(displayAdmin())}>admin</button>
-        <button onClick={() => dispatch(displayTutor())}>tutor</button>
-        <div>board</div>
+        <button
+          className={
+            !tutorView && !adminView
+              ? " text-greenGraded1 font-bold"
+              : " font-bold "
+          }
+          onClick={() => dispatch(displayStudents())}
+        >
+          student
+        </button>
+        <button
+          className={
+            !studentView && !tutorView
+              ? " text-greenGraded1 font-bold"
+              : " font-bold "
+          }
+          onClick={() => dispatch(displayAdmin())}
+        >
+          admin
+        </button>
+        <button
+          className={tutorView ? " text-greenGraded1 font-bold" : " font-bold "}
+          onClick={() => dispatch(displayTutor())}
+        >
+          tutor
+        </button>
+
+        <div className="relative max-w-overviewLayer">
+          {tutorView ? (
+            <div className="absolute">
+              <TotalTutorsProps />
+            </div>
+          ) : adminView ? (
+            <div className="absolute">
+              <TotalAdminProps />
+            </div>
+          ) : (
+            <div className="absolute">
+              <TotalStudentPops />
+            </div>
+          )}
+        </div>
       </div>
-      <div className=" flex justify-center items-center gap-20 flex-row p-responsive2">
-        <div className=" flex justify-center items-center p-responsive2 h-fit bg-lime-600 max-w-overviewLayer">
+      <div className=" flex justify-center items-center gap-10 flex-col p-responsive2">
+        <div className=" flex justify-center items-center p-responsive2 h-fit bg-lime-600 max-w-maxo">
           {tutorView ? (
             <Box
               sx={{
                 height: 400,
                 width: "100%",
+                backgroundColor: "hsl(0, 14%, 97%)",
+                padding: "1.5rem",
               }}
             >
               <Typography
@@ -182,6 +235,14 @@ const StudentsSlice = () => {
                 columns={columns}
                 rows={tutor}
                 getRowId={(row) => row.id}
+                initialState={{
+                  pagination: { paginationModel: { pageSize: 10 } },
+                }}
+                pageSizeOptions={[5, 10, 25]}
+                getRowSpacing={(params) => ({
+                  top: params.isFirstVisible ? 0 : 5,
+                  bottom: params.isLastVisible ? 0 : 5,
+                })}
               />
             </Box>
           ) : adminView ? (
@@ -189,6 +250,8 @@ const StudentsSlice = () => {
               sx={{
                 height: 400,
                 width: "100%",
+                backgroundColor: "hsl(0, 14%, 97%)",
+                padding: "1.5rem",
               }}
             >
               <Typography
@@ -202,6 +265,14 @@ const StudentsSlice = () => {
                 columns={columns}
                 rows={admin}
                 getRowId={(row) => row.id}
+                initialState={{
+                  pagination: { paginationModel: { pageSize: 10 } },
+                }}
+                pageSizeOptions={[5, 10, 25]}
+                getRowSpacing={(params) => ({
+                  top: params.isFirstVisible ? 0 : 5,
+                  bottom: params.isLastVisible ? 0 : 5,
+                })}
               />
             </Box>
           ) : (
@@ -222,23 +293,16 @@ const StudentsSlice = () => {
                 columns={columns}
                 rows={students}
                 getRowId={(row) => row.id}
+                initialState={{
+                  pagination: { paginationModel: { pageSize: 10 } },
+                }}
+                pageSizeOptions={[5, 10, 25]}
+                getRowSpacing={(params) => ({
+                  top: params.isFirstVisible ? 0 : 5,
+                  bottom: params.isLastVisible ? 0 : 5,
+                })}
               />
             </Box>
-          )}
-        </div>
-        <div className="relative max-w-overviewLayer">
-          {tutorView ? (
-            <div className="absolute">
-              <TotalTutorsProps />
-            </div>
-          ) : adminView ? (
-            <div className="absolute">
-              <TotalAdminProps />
-            </div>
-          ) : (
-            <div className="absolute">
-              <TotalStudentPops />
-            </div>
           )}
         </div>
       </div>

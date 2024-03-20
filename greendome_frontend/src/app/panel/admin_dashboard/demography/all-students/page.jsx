@@ -1,5 +1,6 @@
 import React from "react";
-import AllStudent from "@/components/Csr-components/minuteComponents/allStudents";
+
+import AllStudent from "../../../../../components/Csr-components/minuteComponents/allStudents";
 
 const page = () => {
   return (

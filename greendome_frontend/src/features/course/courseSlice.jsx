@@ -11,7 +11,9 @@ const initialState = {
 
 export const GetAllCourse = createAsyncThunk(
   "course/allcourse",
-  AllCoursesThunk
+  async (axios, thunkApi) => {
+    return AllCoursesThunk(axios, thunkApi);
+  }
 );
 export const createCourse = createAsyncThunk(
   "course/createcourse",
@@ -61,9 +63,9 @@ const courseSlice = createSlice({
     [createCourse.fulfilled]: (state, action) => {
       const { payload } = action;
       console.log(payload);
-      state.course = payload.data.course;
+      state.course = payload?.data.course;
       // state.TotalCourse = payload.data.count;
-      state.stats = payload.stats;
+      state.stats = payload?.stats;
       state.isLoading = false;
     },
     [createCourse.rejected]: (state, action) => {

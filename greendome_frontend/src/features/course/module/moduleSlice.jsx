@@ -1,4 +1,5 @@
-import CreateCourse from "@/components/Csr-components/pagesComponent/createCourse";
+import CreateCourse from "../../../components/Csr-components/pagesComponent/createCourse";
+
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   CreateModulesThunk,

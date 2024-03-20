@@ -205,7 +205,7 @@ export const studentSidebarEl = [
       {
         id: 3,
         title: "Finance",
-        urls: "/panel/student_dashboard/all-students",
+        // urls: "/panel/student_dashboard/all-students",
       },
     ],
   },
@@ -222,12 +222,12 @@ export const studentSidebarEl = [
       {
         id: 2,
         title: "Registered Courses",
-        urls: "/panel/student_dashboard/registered-courses",
+        urls: "/panel/student_dashboard/courses/registered-courses",
       },
       {
         id: 3,
         title: "Reports",
-        urls: "/panel/student_dashboard/report",
+        // urls: "/panel/student_dashboard/report",
       },
     ],
   },
@@ -268,10 +268,20 @@ export const studentSidebarEl = [
       },
       {
         id: 2,
-        title: "Upcoming event",
+        title: "Our staff",
+        urls: "/panel/student_dashboard/demography/staff",
+      },
+      {
+        id: 2,
+        title: "all students",
+        urls: "/panel/student_dashboard/demography/all-students",
       },
       {
         id: 3,
+        title: "Upcoming event",
+      },
+      {
+        id: 4,
         title: "Total Expenses",
         urls: "/panel/student_dashboard/expenses",
       },

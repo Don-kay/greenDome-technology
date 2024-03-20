@@ -1,19 +1,25 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import customFetch from "@/utilities/axios";
+import Loading from "../layout_constructs/loading";
+import { setLoading } from "../../../features/user/userSlice";
+import customFetch from "../../../utilities/axios";
 import makeAnimated from "react-select/animated";
 import Select from "react-select";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
-import { createModules } from "@/features/course/module/moduleSlice";
+import { createModules } from "../../../features/course/module/moduleSlice";
 import CreateQuestionId from "./createQuestionId";
 import { useSelector, useDispatch } from "react-redux";
+import { Input, HelperText, Label, Textarea } from "@roketid/windmill-react-ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { resetErrorMsg } from "@/features/course/module/moduleSlice";
-import { resetModule } from "@/features/course/module/moduleSlice";
+import TextARea from "../../TextArea";
+import { resetErrorMsg } from "../../../features/course/module/moduleSlice";
+import { resetModule } from "../../../features/course/module/moduleSlice";
+import Greendome from "../../asset/greendome.jpg";
+import PageTitle from "../../typography/PageTitle";
 import Image from "next/image";
-import FormRow from "@/components/FormRow";
+import FormRow from "../../FormRow";
 import _, { divide } from "lodash";
 
 const initialStates = {
@@ -25,8 +31,14 @@ const initialStates = {
 
 const CreateModule = ({
   paramsName,
-  courseid,
   isOpen,
+  course,
+  courseid,
+  questions,
+  // moduleid,
+  retrieve,
+  moduleRetrieved,
+  setQuestions,
   onClosed,
   modules,
   setModule,
@@ -36,13 +48,21 @@ const CreateModule = ({
   const paramName = paramsName;
   //const paramId = paramsId;
   const [values, setValues] = useState(initialStates);
+  const [error, setError] = useState({
+    duplicateCode: false,
+    maxlength: false,
+  });
   const [levelCont, setLevelCont] = useState();
   const [modal, setModal] = useState({ show: false, msg: "", type: "" });
   const [modalOpen, setModalOpen] = useState(false);
   const [statusCont, setStatusCont] = useState();
   const [file, setFile] = useState();
   const [img, setImg] = useState(false);
+  const [moduler, setModuler] = useState(false);
+  const [trigged, setTrigged] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [onclosetrigger, setOnclosedTrigger] = useState(false);
+  const { isLoading } = useSelector((strore) => strore.user);
   const [featured, setFeatured] = useState(false);
   const [module, setObjModule] = useState();
   const [moduleid, setModuleid] = useState();
@@ -50,7 +70,7 @@ const CreateModule = ({
 
   const disPatch = useDispatch();
   const router = useRouter();
-  // console.log(paramName);
+  //console.log(modules);
   // console.log(paramId);
 
   const statusOptions = [
@@ -72,6 +92,8 @@ const CreateModule = ({
     { value: "2", label: "intermediate" },
     { value: "3", label: "advanced" },
   ];
+  //console.log(isLoading);
+  const moduleQuestion = questions?.filter((i) => i.moduleId === moduleid);
 
   const showModal = (show = false, msg = "", type = "") => {
     setModal(show, msg, type);
@@ -84,6 +106,7 @@ const CreateModule = ({
   useEffect(() => {
     onClosed();
   }, [onclosetrigger]);
+
   // const completedOptions = [
   //   { value: "1", label: true },
   //   { value: "2", label: false },
@@ -149,16 +172,28 @@ const CreateModule = ({
   //   const label = selectedOptions.label;
   //   setCategoryCont(label);
   // };
+  useEffect(() => {
+    const error = setTimeout(() => {
+      setError({ duplicateCode: false });
+      setError({ maxlength: false });
+      // console.log(true);
+    }, 5000);
+
+    return () => clearTimeout(error);
+  }, [trigged]);
 
   const customStyles = {
     content: {
-      top: "0%",
-      left: "0%",
-      minWidth: "100vw",
-      minHeight: "100vh",
-      backgroundColor: "red",
+      position: "relative",
+      top: "20vh",
+      left: "18.5%",
+      maxWidth: "80%",
+      padding: "2%",
+      overflow: "auto",
+      maxHeight: "70vh",
+      backgroundColor: "hsl(112, 42%, 86%)",
       //   transform: "translate(-50%, -50%)",
-      zIndex: 2120,
+      zIndex: 0,
     },
   };
 
@@ -202,12 +237,19 @@ const CreateModule = ({
     const label = selectedOptions.label;
     setStatusCont(label);
   };
+
+  const handleCreateQuestion = () => {
+    setFile(undefined);
+    setModalOpen(true);
+    setTrigger(false);
+  };
   // const handleSelectedFeatured = (selectedOptions) => {
   //   const label = selectedOptions.label;
   //   setFeaturedCont(label);
   // };
   const handleSubmitt = async (e) => {
     e.preventDefault();
+    setLoader(true);
     const { title, description, content, code } = values;
     if (!title || !description || !content || !code) {
       toast.error("please fill out all details");
@@ -236,26 +278,46 @@ const CreateModule = ({
       );
       const resp = { data: res.data, stats: res.status };
       const singleModule = resp.data.modules;
+      //console.log(singleModule);
       if (singleModule._id !== "" || singleModule._id !== undefined) {
         setModule([...modules, singleModule]);
         setObjModule(singleModule);
         setModuleid(singleModule._id);
         setValues({ title: "", description: "", content: "", code: "" });
         setFeatured(false);
+        setModuler(true);
         setLevelCont("");
         setStatusCont("");
         setFile("");
         setTrigger(true);
+        setLoader(false);
       }
 
       // return console.log(resp);
     } catch (error) {
+      // return error?.response.data;
+      if (
+        error?.response.data.msg ===
+        "Duplicate value entered for code field, please choose another value"
+      ) {
+        setError({ duplicateCode: true });
+        setTrigged(!trigged);
+        // console.log(true);
+      }
+      if (
+        error?.response.data.msg ===
+        "module validation failed: description: Path `description` (`guiuj`) is shorter than the minimum allowed length (10)."
+      ) {
+        setError({ maxlength: true });
+        setTrigged(!trigged);
+        // console.log(true);
+      }
       return error?.response.data;
-      // return console.log(error?.response.data);
       // console.log({ stats: error?.response.status}),
 
       // stats: error?.response.status,
     }
+
     // disPatch(
     //   createModules({
     //     title: title,
@@ -273,6 +335,16 @@ const CreateModule = ({
     // const modules = await axios.get();
   };
 
+  useEffect(() => {
+    if (statusCont === "") {
+      setStatusCont("visible");
+    }
+    if (levelCont === "") {
+      setLevelCont("beginner");
+    }
+  }, [handleSelectedLevel, handleSelectedStatus, handleSubmitt]);
+
+  // console.log(moduleid);
   // setTrigger;
   // useEffect(() => {
   //   const timeout = setTimeout(() => {
@@ -287,30 +359,100 @@ const CreateModule = ({
   // }, [handleSubmitt]);
 
   return (
-    <Modal style={customStyles} isOpen={isOpen} onRequestClose={onClosed}>
+    <Modal
+      className={
+        " flex flex-col justify-center items-center rounded-sm p-5 bg-whiteOpaque shadow-default border-y-greenui overflow-y-scroll scrollbar-thin scrollbar-track-metal scrollbar-thumb-dark scroll-p-10 dark:border-strokedark dark:bg-boxdark"
+      }
+      style={customStyles}
+      isOpen={isOpen}
+      onRequestClose={onClosed}
+    >
       <button onClick={() => onClosed()}>Go Back</button>
+      {loader && (
+        <div className=" flex items-center  min-w-innerlay3 h-96 top-36 left-0 z-20 absolute ">
+          <Loading />
+        </div>
+      )}
 
       {trigger ? (
-        <div style={{ position: "relative", top: "20vh" }}>
+        <div className=" relative top-0">
           <h1>module successsfully created, would you like to set questions</h1>
-          <button onClick={() => onClosed()}>no</button>{" "}
-          <button onClick={() => setModalOpen(true)}>yes</button>
+          <div className=" relative flex my-5 justify-center items-center gap-12 flex-row">
+            <button onClick={() => onClosed()}>no</button>
+            <button onClick={() => handleCreateQuestion()}>yes</button>
+          </div>
         </div>
       ) : (
-        <section style={{ position: "relative", top: "20vh" }}>
-          <h1>set module for {paramsName}</h1>
+        <section className=" relative top-10 px-4 py-3 mb-8 flex flex-col gap-y-5 w-2/4 justify-center items-center bg-white rounded-lg shadow-md dark:bg-gray-800">
+          <h1>set module for {paramName}</h1>
           {modal.show && <h2>{errorMsg.msg}</h2>}
-          <form action="">
-            <button onClick={handleSubmitt} type="submit">
-              create
-            </button>
-            <div>Create Module</div>
+          <form className="px-4 py-3 mb-8 flex flex-col gap-y-4" action="">
+            <PageTitle>Create Module</PageTitle>
+
+            <Label>
+              <FormRow
+                type="text"
+                name="title"
+                value={values.title}
+                handleChange={handleChange}
+                className=" p-2"
+              />
+            </Label>
+            <Label>
+              <FormRow
+                type="text"
+                name="content"
+                value={values.content}
+                handleChange={handleChange}
+                className=" p-2"
+              />
+            </Label>
+            <Label>
+              {error.maxlength && (
+                <p className=" text-red">text must not be less than 10</p>
+              )}
+              <TextARea
+                type="text"
+                name="description"
+                value={values.description}
+                handleChange={handleChange}
+                className=" p-2"
+              />
+            </Label>
+            <Label>
+              {error.duplicateCode && (
+                <p className=" text-red">
+                  code is already in use, choose a unique code related to your
+                  course
+                </p>
+              )}
+
+              <small>exampe: XYZ/CFS/112</small>
+              <FormRow
+                type="text"
+                maxLength={11}
+                name="code"
+                value={values.code}
+                handleChange={handleChange}
+              />
+            </Label>
+            <Label>
+              <FormRow
+                type="checkbox"
+                name="featured"
+                value={featured}
+                //   check={featured}
+                handleChange={handleFeatured}
+              />
+            </Label>
+
             <FormRow
               type="file"
               accept="image/*"
               name="profile-image"
-              // value={url}
+              // value={values.password}
               handleChange={handleImageFile}
+              className=" p-2"
             />
             <div>
               {img && (
@@ -318,45 +460,13 @@ const CreateModule = ({
                   image exceeds 1mb, choose another inage
                 </small>
               )}
-              {file !== undefined && (
-                <Image width={200} height={200} src={file} alt="image" />
+              {file === undefined || file === "" ? (
+                <Image width={100} height={100} src={Greendome} alt="image" />
+              ) : (
+                <Image width={100} height={100} src={file} alt="image" />
               )}
             </div>
-            <FormRow
-              type="text"
-              name="title"
-              value={values.title}
-              handleChange={handleChange}
-            />
-            <FormRow
-              type="text"
-              name="content"
-              value={values.content}
-              handleChange={handleChange}
-            />
-            <FormRow
-              type="text"
-              name="description"
-              value={values.description}
-              handleChange={handleChange}
-            />
-            <div>
-              <small>should be text and numbers</small>
-              <FormRow
-                type="text"
-                name="code"
-                value={values.code}
-                handleChange={handleChange}
-              />
-            </div>
 
-            <FormRow
-              type="checkbox"
-              name="featured"
-              value={featured}
-              //   check={featured}
-              handleChange={handleFeatured}
-            />
             <div>
               <h5>Status</h5>
               <Select
@@ -383,6 +493,9 @@ const CreateModule = ({
                 placeholder="level"
               />
             </div>
+            <button onClick={handleSubmitt} type="submit">
+              create
+            </button>
           </form>
         </section>
       )}
@@ -392,8 +505,11 @@ const CreateModule = ({
         moduleid={moduleid}
         courseid={courseid}
         paramsName={paramName}
-        moduler={module}
+        module1={module}
+        moduler={moduler}
         setOnclosed={setOnclosedTrigger}
+        Questions1={moduleQuestion}
+        setQuestions={setQuestions}
       />
     </Modal>
   );

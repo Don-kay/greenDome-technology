@@ -1,45 +1,143 @@
 import { NextResponse, NextRequest } from "next/server";
 import jwtDecode from "jwt-decode";
+import {
+  Company,
+  Admin,
+  AdminTutor,
+  AdminStudent,
+  AdminTutorStudent,
+  TutorStudent,
+  Tutor,
+  Student,
+} from "./components/ROLE_LISTS";
+import moment from "moment";
 // import { jwtVerify } from "jose";
 
 const isProfileRoute = (pathname) => {
   return pathname.includes("/view_profile");
 };
-
 const isUserRoute = (pathname) => {
   return pathname.startsWith("/panel");
+};
+const isLoginRoute = (pathname) => {
+  return pathname.startsWith("/dome");
+};
+const isNotLoginRoute = (pathname) => {
+  return !pathname.startsWith("/dome");
+};
+const isStudenDashboard = (pathname) => {
+  return pathname === "/panel/student_dashboard";
 };
 const PanelRoute = (pathname) => {
   return pathname.startsWith("/panel/admin_dashboard");
 };
-const arrayLoop = ["company", "Admin", "tutor", "student"];
-const adminnArray = ["company", "Admin", "tutor"];
+
+const areEqual = (arr1, arr2) => {
+  let N = arr1?.length;
+  let M = arr2?.length;
+
+  // If lengths of array are not equal means
+  // array are not equal
+  if (N != M) {
+    return false;
+  }
+
+  // Sort both arrays
+  arr1?.sort();
+  arr2?.sort();
+
+  // Linearly compare elements
+  for (let i = 0; i < N; i++)
+    if (arr1[i] != arr2[i]) {
+      // console.log(arr1[i]);
+      // console.log(arr2[i]);
+      return false;
+    } else {
+      // If all elements were same.
+      return true;
+    }
+};
+
+let jwtoken = false;
+
+const array = {};
 
 export default function middleware(req, res) {
   const { cookies } = req;
   const jwt = cookies.get("myToken")?.value;
-  // const url = req.url;
   const { pathname } = req.nextUrl;
-  // console.log(pathname);
-  // console.log(cookies);
-  if (!jwt) {
-    return NextResponse.redirect("http://localhost:3000/login");
+  const { referer } = req.headers;
+  let decodedToken = "";
+  if (jwt !== undefined) {
+    decodedToken = jwtDecode(jwt);
   }
-  const role = jwtDecode(jwt);
-  const user = role.roles;
-  const isAuthentic = user.some((ai) => arrayLoop.includes(ai));
-  const isPanel = user.some((ai) => adminnArray.includes(ai));
-  // console.log(isPanel);
+  let currentDate = new Date();
+  let isStudent = false;
+  let isPanel = false;
+  let isTutor = false;
 
-  if (isUserRoute(pathname) && !isAuthentic) {
-    return NextResponse.redirect("http://localhost:3000/login", req.url);
+  //console.log(jwt === undefined);
+  if (
+    (jwt === undefined && isNotLoginRoute(pathname)) ||
+    (decodedToken.exp * 1000 < currentDate.getTime() &&
+      isNotLoginRoute(pathname))
+  ) {
+    return NextResponse.redirect("http://localhost:3000/dome/login");
   }
-  if (PanelRoute(pathname) && !isPanel) {
-    return NextResponse.redirect("http://localhost:3000/student_dashboard");
+  const user = decodedToken.roles;
+  // console.log(isPanel);
+  if (areEqual(user, Company)) {
+    isPanel = true;
+  } else if (areEqual(user, Student)) {
+    isStudent = true;
+  } else if (areEqual(user, Admin)) {
+    isPanel = true;
+  } else if (areEqual(user, AdminTutor)) {
+    isPanel = true;
+  } else if (areEqual(user, AdminTutorStudent)) {
+    isPanel = true;
+  } else if (areEqual(user, AdminStudent)) {
+    isPanel = true;
+  } else if (areEqual(user, Tutor)) {
+    isTutor = true;
+  } else if (areEqual(user, TutorStudent)) {
+    isTutor = true;
   }
-  // if (isProfileRoute(pathname) && isPanel) {
-  //   return console.log(jwt)
+
+  // console.log();
+
+  if (
+    decodedToken.exp * 1000 > currentDate.getTime() &&
+    isLoginRoute(pathname) &&
+    isPanel
+  ) {
+    return NextResponse.redirect("http://localhost:3000/panel/admin_dashboard");
+  }
+  if (
+    decodedToken.exp * 1000 > currentDate.getTime() &&
+    isLoginRoute(pathname) &&
+    isStudent
+  ) {
+    return NextResponse.redirect(
+      "http://localhost:3000/panel/student_dashboard"
+    );
+  }
+
+  // if (isUserRoute(pathname) && !isStudent) {
+  //   return NextResponse.redirect("http://localhost:3000/dome/login", req.url);
   // }
+  if (PanelRoute(pathname) && !isPanel) {
+    return NextResponse.redirect(
+      "http://localhost:3000/panel/student_dashboard"
+    );
+  }
+  if (PanelRoute(pathname) && isTutor) {
+    return NextResponse.redirect("http://localhost:3000/panel/tutor_dashboard");
+  }
+  if (isProfileRoute(pathname) && isPanel) {
+    return console.log(jwt);
+  }
+
   return NextResponse.next();
   // console.log(jwt);
   // if (url.includes("/greendometech")) {
@@ -53,7 +151,6 @@ export default function middleware(req, res) {
   // // const { origin } = req.nexturl;
   // return NextResponse.next();
 }
-
 export const config = {
-  matcher: ["/panel/:path*", "/panel/admin_dashboard/:path*"],
+  matcher: ["/dome/:path*", "/panel/:path*", "/panel/admin_dashboard/:path*"],
 };

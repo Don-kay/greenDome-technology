@@ -1,20 +1,24 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAllUsers } from "@/features/profile/profileSlice";
+import { GetAllUsers } from "../../../features/profile/profileSlice";
 import makeAnimated from "react-select/animated";
 import StudentsSlice from "../minuteComponents/slicedRolecomp.jsx";
-import functionsSpace from "@/features/functions/functions.jsx";
-import customFetch from "@/utilities/axios.js";
+import functionsSpace from "../../../features/functions/functions.jsx";
+import customFetch from "../../../utilities/axios.js";
 import Select from "react-select";
 import Image from "next/image";
 import { useRouter } from "next/navigation.js";
+import PageTitle from "../../typography/PageTitle";
+import InfoCard2 from "../../Cards/InfoCard 2";
 import TotalStudentPops, {
   TotalTutorsProps,
   TotalAdminProps,
 } from "../minuteComponents/sudentPops.jsx";
-import { adminUpdateUsers } from "@/features/profile/profileSlice";
+import { adminUpdateUsers } from "../../../features/profile/profileSlice";
 import _ from "lodash";
+import Loading from "../layout_constructs/loading";
+import { setLoading } from "../../../features/user/userSlice";
 
 const RoleView = () => {
   const dispatch = useDispatch();
@@ -25,8 +29,10 @@ const RoleView = () => {
   const [rowId, setRowId] = useState(null);
   const [trigger, setTrigger] = useState(false);
   const [isId, setisId] = useState(null);
+  const { isLoading } = useSelector((strore) => strore.user);
 
   useEffect(() => {
+    dispatch(setLoading(true));
     const fetchUsers = async () => {
       try {
         const res = await customFetch.get("/auth/users", {
@@ -36,6 +42,7 @@ const RoleView = () => {
         //console.log(res);
         const resp = { data: res.data.user, stats: res.status };
         setUsers(resp.data);
+        dispatch(setLoading(false));
       } catch (error) {
         return { msg: error };
       }
@@ -48,10 +55,11 @@ const RoleView = () => {
     { value: "3", label: "company" },
     { value: "4", label: "Admin" },
   ];
-
+  //console.log(roleCont);
   const handleSelected = (selectedOptions) => {
     const label = selectedOptions.map((i) => i.label);
-    setRoleCont(label);
+    //console.log(label.sort());
+    setRoleCont(label.sort());
   };
 
   const confirmId = (id) => {
@@ -76,10 +84,14 @@ const RoleView = () => {
             credentials: "includes",
           }
         );
+        if (res.status === 200) {
+          console.log(res.status);
+          setTrigger(!trigger);
+        }
       } catch (error) {
         return { msg: error };
       }
-      setTrigger(true);
+
       // dispatch(
       //   adminUpdateUsers({
       //     params: rowId,
@@ -94,30 +106,42 @@ const RoleView = () => {
   };
 
   return (
-    <section className="panel relative top-10   h-screen bg-purple">
-      <div>board</div>
-      <div>
+    <section className="panel relative flex items-center gap-y-9 flex-col  top-10   h-screen bg-purple">
+      <PageTitle>all users</PageTitle>
+      <div className="grid grid-cols-3 gap-x-20 gap-y-14 relative top-0 border-b-width1px pb-16 border-grey">
+        {isLoading && (
+          <div className=" w-full h-full z-20 absolute">
+            <Loading />
+          </div>
+        )}
         {users?.map((item, ids) => {
           const { firstname, lastname, username, roles, image } = item;
           const { id } = item;
           const Role = functionsSpace(roles);
+          const imageType = image === undefined || image === "" ? "" : image;
 
           return (
-            <section key={ids}>
-              <div key={ids}>
-                <div key={ids}>
-                  {image && (
-                    <Image width={200} height={200} src={image} alt="image" />
-                  )}
-                </div>
-                user: {ids} <h2>{firstname}</h2>
-                <h2>{lastname}</h2>
-                <h2>{username}</h2>
-                <h2>{id}</h2>
-                <h2>{Role}</h2>
-              </div>
+            <section
+              // className=" flex justify-center item-center flex-col"
+              key={ids}
+            >
+              <InfoCard2
+                imageType={imageType}
+                value1={ids}
+                value2={firstname}
+                value3={lastname}
+                value4={username}
+                value5={id}
+                value6={Role}
+                sub1="no."
+                sub2="firstname"
+                sub3="lastname"
+                sub4="username"
+                sub5="id"
+                sub6="role"
+              />
               <form onSubmit={handleSubmit}>
-                <h5>Assign roles</h5>
+                <PageTitle>Assign roles</PageTitle>
                 <div onClick={() => confirmId(id)}>
                   <Select
                     key={ids}
@@ -125,6 +149,7 @@ const RoleView = () => {
                     name="roles"
                     isClearable={true}
                     options={roleOptions}
+                    className=" w-96"
                     id="roles"
                     onChange={handleSelected}
                     isMulti={true}
@@ -140,7 +165,7 @@ const RoleView = () => {
           );
         })}
       </div>
-      <StudentsSlice />
+      <StudentsSlice trigger={trigger} />
       {/* <div className="relative">
         <div className="absolute">
           <TotalStudentPops />

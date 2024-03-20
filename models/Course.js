@@ -27,7 +27,7 @@ const CourseSchema = new mongoose.Schema(
       type: String,
       required: [true, "please provide course code"],
       unique: [true, "please provide another value"],
-      maxLength: 10,
+      maxLength: 11,
       trim: true,
     },
     image: {

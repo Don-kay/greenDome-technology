@@ -25,8 +25,8 @@ const register = async (req, res) => {
     certificate,
   } = req.body;
   if (
-    firstname === " " ||
-    lastname === " " ||
+    firstname === "" ||
+    lastname === "" ||
     country === "" ||
     country === undefined ||
     email === "" ||
@@ -35,8 +35,8 @@ const register = async (req, res) => {
     password === "" ||
     mobilenumber === "" ||
     biography === "" ||
-    roles === [""] ||
-    roles === undefined
+    roles === ""
+    // roles === undefined
   ) {
     res.status(StatusCodes.BAD_REQUEST).send("fields cannot be empty");
   } else if (roles === "tutor" && certificate.length === 0) {
@@ -78,10 +78,9 @@ const register = async (req, res) => {
   //note...they must be stored with the exact body value
   const token = user.CreateJwt();
   res
-    .cookie("myToken", token, { httpOnly: true })
+    // .cookie("myToken", token, { httpOnly: true })
     .status(StatusCodes.CREATED)
     .json({
-      token,
       user: {
         email: user.email,
         firstname: user.firstname,
@@ -111,20 +110,73 @@ const userNameLogin = async (req, res) => {
     res.status(StatusCodes.NOT_FOUND).send("Invalid credentials");
   }
   const Roles = user.roles;
-  //you must use the new user from findone method to createjwt
-  // const token = user.CreateJwt();
-  res.status(StatusCodes.OK).json({
-    user: {
-      firstname: user.firstname,
-      username: user.username,
-      email: user.email,
-      country: user.country,
-      mobilenumber: user.mobilenumber,
-      roles: Roles,
-      image: user.image,
-    },
-  });
 
+  //you must use the new user from findone method to createjwt
+  const token = user.CreateJwt();
+  // const token = user.CreateJwt();
+
+  res
+    .setHeader(
+      "set-cookie",
+      cookie.serialize("myToken", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development",
+        // maxAge: 10,
+        path: "/",
+      })
+    )
+    .cookie("myToken", token, { httpOnly: true })
+    .status(StatusCodes.OK)
+    .json({
+      user: {
+        msg: "succesfully signed in",
+        id: user._id,
+        firstname: user.firstname,
+        username: user.username,
+        email: user.email,
+        country: user.country,
+        mobilenumber: user.mobilenumber,
+        roles: Roles,
+        image: user.image,
+      },
+    });
+
+  // res.send("Login page");
+};
+const logout = async (req, res) => {
+  const {
+    params: { id: loggedInUser },
+  } = req;
+
+  // console.log(loggedInUser);
+  const user = await User.findById({ _id: loggedInUser });
+  if (!user) {
+    res.status(StatusCodes.NOT_FOUND).send("not logged in");
+    // throw new UnauthenticatedError("Invalid Credentials, sign up");
+    return;
+  }
+  // console.log(user);
+  const token = user.LogoutJwt();
+  // console.log(token);
+  res
+    .setHeader(
+      "set-cookie",
+      cookie.serialize("myToken", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development",
+        // maxAge: 10,
+        path: "/",
+      })
+    )
+    .cookie("myToken", token, { httpOnly: true })
+    .status(StatusCodes.OK)
+    .json({
+      token,
+      data: {
+        msg: "succesfully logged out",
+      },
+    });
+  return;
   // res.send("Login page");
 };
 const emailLogin = async (req, res) => {
@@ -159,14 +211,13 @@ const emailLogin = async (req, res) => {
       cookie.serialize("myToken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "development",
-        maxAge: 3600,
+        // maxAge: 10,
         path: "/",
       })
     )
     .cookie("myToken", token, { httpOnly: true })
     .status(StatusCodes.OK)
     .json({
-      token,
       user: {
         msg: "succesfully signed in",
         id: user._id,
@@ -192,7 +243,23 @@ const GetSingleUsers = async (req, res) => {
     res.status(StatusCodes.NOT_FOUND).send("no user found");
   }
   res.status(StatusCodes.OK).json({
-    user,
+    user: {
+      email: user.email,
+      firstname: user.firstname,
+      username: user.username,
+      lastname: user.lastname,
+      country: user.country,
+      roles: user.roles,
+      mobilenumber: user.mobilenumber,
+      image: user.image,
+      biography: user.biography,
+      certificate: user.certificate,
+      classesId: user.classesId,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      id: user._id,
+      rating: user.rating,
+    },
   });
 };
 const GetAllUsers = async (req, res) => {
@@ -348,6 +415,7 @@ const DeleteAllProfile = async (req, res) => {
 
 module.exports = {
   register,
+  logout,
   userNameLogin,
   emailLogin,
   GetAllUsers,

@@ -1,5 +1,6 @@
 import React from "react";
-import ViewModules from "@/components/Csr-components/pagesComponent/viewModule";
+
+import ViewModules from "../../../../../../../components/Csr-components/pagesComponent/viewModule";
 
 const View_module = (req) => {
   // console.log(req);
@@ -13,7 +14,7 @@ const View_module = (req) => {
     return string;
   }
   const paramsName = replaceAll(paraname, "%20", " ");
-  // console.log(paramsName);
+  // console.log(paramId);
 
   //   function replaceAll(string, token, newtoken) {
   //     while (string.indexOf(token) != -1) {

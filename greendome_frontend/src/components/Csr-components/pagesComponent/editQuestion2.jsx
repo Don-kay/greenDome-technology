@@ -2,10 +2,15 @@
 import React, { useState, useRef, forwardRef, useEffect } from "react";
 import axios from "axios";
 import _ from "lodash";
+import PageTitle from "../../typography/PageTitle";
+import Loading from "../layout_constructs/loading";
+import { setLoading } from "../../../features/user/userSlice";
 import Image from "next/image";
-import { getQuestions } from "@/features/course/module/moduleSlice";
+import { Input, HelperText, Label, Textarea } from "@roketid/windmill-react-ui";
+import { getQuestions } from "../../../features/course/module/moduleSlice";
 import { useRouter } from "next/navigation";
-import FormRow from "@/components/FormRow";
+import FormRow from "../../FormRow";
+import Select from "react-select";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,13 +22,18 @@ function EditQuestion({
   courseid,
   isOpen,
   onClosed,
+  Question,
+  Questions1,
   Questions,
+  setQuestions,
   setQuestion,
+  setModuleQuestion,
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const [file, setFile] = useState("");
   const [img, setImg] = useState(false);
+  const [loader, setLoader] = useState(false);
   // const { allQuestions } = useSelector((strore) => strore.module);
   const [questionCont, setQuestionCont] = useState([]);
   // console.log(moduleParam);
@@ -38,52 +48,34 @@ function EditQuestion({
     d: "",
     answer: "",
     image: "undefined",
+    className: "",
   };
   const [updatedQuestion, setUpdatedQuestion] = useState(initialQuestions);
 
   useEffect(() => {
-    try {
-      const fetch = async () => {
-        const profiles = await axios.get(
-          `http://localhost:8000/greendometech/ng/module/assessment/all-questions/${moduleParam}`,
-          {
-            withCredentials: true,
-            credentials: "includes",
-          }
-        );
-        const resp = { data: profiles.data.question, stats: profiles.status };
+    const questions = _.toString(Question?.map((i) => i.question));
+    const moduleName = _.toString(Question?.map((i) => i.className));
+    const answer = _.toString(Question?.map((i) => i.answer));
+    const option1 = _.toString(Question?.map((i) => i.option1));
+    const option2 = _.toString(Question?.map((i) => i.option2));
+    const option3 = _.toString(Question?.map((i) => i.option3));
+    const option4 = _.toString(Question?.map((i) => i.option4));
+    const image = _.toString(Question?.map((i) => i.image));
+    //console.log(singleQuestion);
 
-        const singleQuestion = resp.data?.filter(
-          (item) => item._id === questionParam
-        );
-        const questions = _.toString(singleQuestion?.map((i) => i.question));
-        const answer = _.toString(singleQuestion?.map((i) => i.answer));
-        const option1 = _.toString(singleQuestion?.map((i) => i.option1));
-        const option2 = _.toString(singleQuestion?.map((i) => i.option2));
-        const option3 = _.toString(singleQuestion?.map((i) => i.option3));
-        const option4 = _.toString(singleQuestion?.map((i) => i.option4));
-        const image = _.toString(singleQuestion?.map((i) => i.image));
-        // console.log(image);
+    const imgs = !image ? "" : image;
 
-        const img = !image ? "" : image;
-
-        setUpdatedQuestion({
-          questions: questions,
-          answer: answer,
-          a: option1,
-          b: option2,
-          c: option3,
-          d: option4,
-          image: img,
-        });
-        setFile(img);
-        // setQuestionCont(resp.data);
-      };
-
-      fetch();
-    } catch (error) {
-      return { msg: error.response.data };
-    }
+    setUpdatedQuestion({
+      questions: questions,
+      answer: answer,
+      a: option1,
+      b: option2,
+      c: option3,
+      d: option4,
+      image: imgs,
+      className: moduleName,
+    });
+    setFile(imgs);
   }, [questionParam]);
 
   // const id = _.toString(singleQuestion?.map((i) => i._id));
@@ -91,13 +83,15 @@ function EditQuestion({
   const customStyles = {
     content: {
       position: "relative",
-      top: "20vh",
-      left: "0%",
-      minWidth: "100vw",
-      minHeight: "100vh",
-      backgroundColor: "red",
+      top: "4vh",
+      left: "18.5%",
+      maxWidth: "80%",
+      padding: "8%",
+      overflow: "auto",
+      maxHeight: "90vh",
+      backgroundColor: "hsl(112, 42%, 86%)",
       //   transform: "translate(-50%, -50%)",
-      zIndex: 2120,
+      zIndex: 0,
     },
   };
 
@@ -141,11 +135,12 @@ function EditQuestion({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { questions, a, b, c, d, answer } = updatedQuestion;
+    const { questions, a, b, c, d, answer, className } = updatedQuestion;
 
     if (!questions || !a || !b || !c || !d || !answer) {
       toast.error("please fill all details");
     }
+    setLoader(true);
 
     const res = await axios.put(
       `http://localhost:8000/greendometech/ng/module/assessment/questions/update/${questionParam}/${moduleParam}`,
@@ -157,17 +152,18 @@ function EditQuestion({
         option4: d,
         answer: answer,
         image: file,
+        className: className,
       },
       {
         withCredentials: true,
         credentials: "include",
       }
     );
-    console.log(res.data);
+    console.log(res.status);
 
     const updateQuestion = res.data.questions;
     const updatedId = updateQuestion._id;
-    const refreshed = Questions.filter((item) => item._id !== updatedId);
+    const refreshed = Questions1.filter((item) => item._id !== updatedId);
 
     const refreshedQuestion = [...refreshed, updateQuestion];
 
@@ -175,7 +171,12 @@ function EditQuestion({
       r1.createdAt > r2.createdAt ? 1 : r1.createdAt < r2.createdAt ? -1 : 0
     );
 
-    setQuestion(sortedQuestions);
+    setQuestions(sortedQuestions);
+    setModuleQuestion(sortedQuestions);
+    if (res.status === 200) {
+      setLoader(false);
+    }
+    // setQuestion([...Question, sortedQuestions]);
     if (updatedId !== "") {
       onClosed();
     }
@@ -198,75 +199,109 @@ function EditQuestion({
     //     dispatch(GetAllUsers());
   };
   return (
-    <Modal style={customStyles} isOpen={isOpen} onRequestClose={onClosed}>
+    <Modal
+      className={" flex items-center flex-col"}
+      style={customStyles}
+      isOpen={isOpen}
+      onRequestClose={onClosed}
+    >
       <button onClick={() => onClosed()}>Go Back</button>
-      <form onSubmit={handleSubmit}>
-        {/* <h1>Update {`${username}`} profile</h1> */}
+      <div className="px-4 py-3 mb-8 flex flex-col gap-y-5 w-2/4 justify-center items-center bg-white rounded-lg shadow-md dark:bg-gray-800">
+        {loader && (
+          <div className=" flex items-center  min-w-innerlay3 h-96 top-44 left-0 z-20 absolute ">
+            <Loading />
+          </div>
+        )}
+        <form
+          onSubmit={handleSubmit}
+          action=""
+          className="px-4 py-3 mb-8 flex flex-col gap-y-4"
+        >
+          <PageTitle>edit module</PageTitle>
 
-        <FormRow
-          type="file"
-          accept="image/*"
-          name="profile-image"
-          // value={url}
-          handleChange={handleImageFile}
-        />
-        <div>
-          {img && (
-            <small style={{ color: "red" }}>
-              image exceeds 1mb, choose another inage
-            </small>
-          )}
-          {file !== "" && (
-            <Image width={200} height={200} src={file} alt="image" />
-          )}
-        </div>
-
-        <div>
+          <Label>
+            <FormRow
+              type="text"
+              name="questions"
+              value={updatedQuestion.questions}
+              handleChange={handleChange}
+              className=" p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name={`a`}
+              value={updatedQuestion.a}
+              handleChange={handleChange}
+              className=" p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name={`b`}
+              value={updatedQuestion.b}
+              handleChange={handleChange}
+              className=" p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name={`c`}
+              value={updatedQuestion.c}
+              handleChange={handleChange}
+              className=" p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name={`d`}
+              value={updatedQuestion.d}
+              handleChange={handleChange}
+              className=" p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name="answer"
+              value={updatedQuestion.answer}
+              handleChange={handleChange}
+              className=" p-2"
+            />
+          </Label>
           <FormRow
-            type="text"
-            name="questions"
-            value={updatedQuestion.questions}
-            handleChange={handleChange}
-            // handleOnFocus={() => handleOnFocus()}
-            // handleOnBlur={handleOnBlur}
+            type="file"
+            accept="image/*"
+            name="profile-image"
+            // value={values.password}
+            handleChange={handleImageFile}
+            className=" p-2"
           />
-          <FormRow
-            type="text"
-            name={`a`}
-            value={updatedQuestion.a}
-            handleChange={handleChange}
-            // handleOnFocus={handleOnFocus}
-            // handleOnBlur={handleOnBlur}
-          />
-          <FormRow
-            type="text"
-            name={`b`}
-            value={updatedQuestion.b}
-            handleChange={handleChange}
-          />
-          <FormRow
-            type="text"
-            name="c"
-            value={updatedQuestion.c}
-            handleChange={handleChange}
-          />
-          <FormRow
-            type="text"
-            name="d"
-            value={updatedQuestion.d}
-            handleChange={handleChange}
-          />
-          <FormRow
-            type="text"
-            name="answer"
-            value={updatedQuestion.answer}
-            handleChange={handleChange}
-          />
-        </div>
-
-        <button>submit</button>
-      </form>
-      <div>editProfile</div>;
+          <div>
+            {img && (
+              <small style={{ color: "red" }}>
+                image exceeds 1mb, choose another inage
+              </small>
+            )}
+            {file === "" || file === undefined ? (
+              ""
+            ) : (
+              <Image width={200} height={200} src={file} alt="image" />
+            )}
+          </div>
+          <button type="submit">submit</button>
+        </form>
+        {/* <Label className="mt-6" check>
+          <Input type="checkbox" />
+          <span className="ml-2">
+            I agree to the <span className="underline">privacy policy</span>
+          </span>
+        </Label> */}
+      </div>
     </Modal>
   );
 }

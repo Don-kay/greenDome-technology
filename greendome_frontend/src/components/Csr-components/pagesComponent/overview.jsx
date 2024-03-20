@@ -1,14 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Loading from "../layout_constructs/loading";
 import RolesCharts from "../minuteComponents/rolesCharts";
 import CourseCharts from "../minuteComponents/courseCharts";
 import RevenueCharts from "../minuteComponents/revenueCharts";
 import StudentsSlice from "../minuteComponents/slicedRolecomp";
-import Calender from "../minuteComponents/calender";
+import Calendar from "./calendar";
 import EventsChart from "../minuteComponents/eventsChart";
-import { GetAllCourse } from "@/features/course/courseSlice";
+import { GetAllCourse } from "../../../features/course/courseSlice";
 import RatedCourse from "../minuteComponents/ratedCourse";
-import { GetAllUsers } from "@/features/profile/profileSlice";
+import { GetAllUsers } from "../../../features/profile/profileSlice";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 
@@ -17,75 +18,96 @@ const Overview = () => {
   const [course, setCourses] = useState([]);
   const { user } = useSelector((strore) => strore.user);
   const { users } = useSelector((state) => state.profiles);
+  // const { course } = useSelector((state) => state.course);
   const loggedInUserId = user.data.user.id;
-  const loggedInUser = users.filter((i) => i.id === loggedInUserId);
+  const loggedInUser = users?.filter((i) => i.id === loggedInUserId);
 
-  const IsStudent = loggedInUser.map((i) => {
+  const Student = loggedInUser?.map((i) => {
     return i.roles.includes("student");
   });
 
-  const student = user.data.user;
-  const studentParams = student.id;
+  const IsStudent = _.toString(Student);
+  // console.log(IsStudent);
+  // console.log(IsStudentBool);
+  // console.log(loggedInUser);
 
-  const isStudent = _.toString(IsStudent);
+  const loggeduser = user.data.user;
+  const userParams = loggeduser.id;
+
+  // const isStudent = _.toString(IsStudent);
   // console.log(users);
+  const cancelToken = axios.CancelToken.source();
 
   const getAllcourses = async () => {
+    axios.defaults.withCredentials = true;
     try {
       const profiles = await axios.get(
-        "http://localhost:8000/greendometech/ng/course/admin/view-all-course",
-        {
-          withCredentials: true,
-          credentials: "includes",
-        }
+        "http://localhost:8000/greendometech/ng/course/admin/view-all-course"
       );
-      const resp = { data: profiles.data, stats: profiles.status };
-      setCourses(resp);
+      // console.log(profiles);
+      const resp = { data: profiles.data.course, stats: profiles.status };
+      setCourses(resp.data);
+      // console.log(resp.data);
     } catch (error) {
-      return { msg: error.response.data };
+      if (axios.isCancel(error)) {
+        return { msg: error };
+      }
     }
   };
 
   useEffect(() => {
-    dispatch(GetAllCourse());
+    dispatch(GetAllUsers());
     getAllcourses();
+
+    // return () => {
+    //   cancelToken.cancel();
+    // };
   }, []);
-  console.log(course);
+  //console.log(course);
   // console.log(TotalCourse);
 
   return (
-    <main className="flex h-fit justify-center bg-bubblegum gap-2 ">
-      {isStudent ? (
-        <section>
-          <div className=" h-fit bg-purple p-responsive3 border-dark min-w-innerlay">
-            <CourseCharts
-              course={course}
-              params={studentParams}
-              isStudent={isStudent}
-            />
-          </div>
-          <div className="min-w-innerlay2 bg-red-700">
-            Calender % student rating
-            <Calender params={studentParams} isStudent={isStudent} />
-            <EventsChart params={studentParams} isStudent={isStudent} />
-            <RatedCourse params={studentParams} isStudent={isStudent} />
-          </div>
-        </section>
+    <main className=" relative  top-0 flex h-fit justify-center bg-bubblegum gap-2 ">
+      {course?.length === 0 ? (
+        <Loading />
       ) : (
-        <section>
-          <div className=" h-fit bg-purple p-responsive3 border-dark min-w-innerlay">
-            <RolesCharts />
-            <CourseCharts params={studentParams} isStudent={isStudent} />
-            <RevenueCharts />
-            <StudentsSlice />
-          </div>
-          <div className="min-w-innerlay2 bg-red-700">
+        <div>
+          {IsStudent === "true" ? (
+            <section>
+              <div className="h-fit p-responsive3   border-x-metal min-w-innerlay">
+                <CourseCharts
+                  course={course}
+                  params={userParams}
+                  isStudent={IsStudent}
+                />
+              </div>
+              <div className="min-w-innerlay2 bg-red-700">
+                <Calendar params={userParams} isStudent={IsStudent} />
+                {/* <EventsChart params={userParams} isStudent={IsStudent} /> */}
+                {/* <RatedCourse params={userParams} isStudent={IsStudent} /> */}
+              </div>
+            </section>
+          ) : (
+            <section>
+              <div className=" h-fit bg-white p-responsive3   border-x-metal min-w-innerlay">
+                <RolesCharts />
+                <CourseCharts
+                  course={course}
+                  params={userParams}
+                  isStudent={IsStudent}
+                />
+                <RevenueCharts course={course} />
+                <StudentsSlice />
+              </div>
+              {/* <div className="min-w-innerlay2 bg-red-700">
             Calender % student rating
-            <Calender params={studentParams} isStudent={isStudent} />
-            <EventsChart params={studentParams} isStudent={isStudent} />
-            <RatedCourse params={studentParams} isStudent={isStudent} />
-          </div>
-        </section>
+            <Calender params={userParams} isStudent={IsStudent} />
+            <EventsChart params={userParams} isStudent={IsStudent} />
+            <RatedCourse params={userParams} isStudent={IsStudent} />
+          </div> */}
+            </section>
+          )}
+        </div>
       )}
     </main>
   );

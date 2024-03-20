@@ -1,4 +1,5 @@
 const Class = require("../models/class");
+const Modules = require("../models/Course");
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
@@ -8,7 +9,7 @@ const CreateClass = async (req, res) => {
     user: { userId },
   } = req;
   const user = await User.findById({ _id: userId });
-  // console.log(user);
+  console.log(req.body);
   if (!req.body) {
     res.status(StatusCodes.BAD_REQUEST).send("fill in all credentials");
   }
@@ -92,10 +93,23 @@ const AdminUpdateAllUsersClass = async (req, res) => {
     new: true,
     runValidators: true,
   });
+  const modules = await Modules.findOneAndUpdate(
+    { classId: classesId },
+    { className: name },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
   if (!course) {
     throw new NotFoundError(`sorry no class found with id: ${classesId}`);
   }
-  res.status(StatusCodes.OK).json({ course });
+  res.status(StatusCodes.OK).json({ course, modules });
+  if (!modules) {
+    res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ course, msg: `sorry no module found with id: ${classesId}` });
+  }
 };
 const UpdateProfit = async (req, res) => {
   const {

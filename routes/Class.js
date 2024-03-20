@@ -30,7 +30,7 @@ const {
 Router.route("/create-course").post(CreateClass).get(GetUsersClass);
 // get all courses by admin
 Router.route("/admin/view-all-course").get(
-  AuthenticateRoles(Role_List.C1856, Role_List.A3769),
+  // AuthenticateRoles(Role_List.C1856, Role_List.A3769),
   AdminGetAllUsersClass
 );
 Router.route("/myclasses/:id").get(GetsingleClass);
@@ -54,6 +54,7 @@ Router.route("/myclasses/assign-students/:id/classes/:classid").put(
   assignStudent
 );
 Router.route("/myclasses/unassign-students/:id/classes/:classid").put(
+  AuthenticateRoles(Role_List.C1856, Role_List.A3769),
   UnassignStudent
 );
 Router.route("/myclasses/assign-course/:id/classes/:classid").put(

@@ -1,18 +1,25 @@
 "use client";
 import React, { useState, useEffect } from "react";
+
 import axios from "axios";
-import customFetch from "@/utilities/axios";
+import customFetch from "../../../utilities/axios";
 import Image from "next/image";
 import Select from "react-select";
+import Loading from "../layout_constructs/loading";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Modal from "react-modal";
 import { useSelector, useDispatch } from "react-redux";
 import EditQuestion from "./editQuestion2";
+import PageTitle from "../../typography/PageTitle";
+import { Input, HelperText, Label, Textarea } from "@roketid/windmill-react-ui";
+import functionsSpace from "../../../features/functions/functions";
+import InfoCard2 from "../../Cards/InfoCard 2";
 import Link from "next/link";
 import Greendome from "../../asset/greendome.jpg";
-import { resetErrorMsg } from "@/features/course/module/moduleSlice";
-import FormRow from "@/components/FormRow";
+import { resetErrorMsg } from "../../../features/course/module/moduleSlice";
+import moment from "moment";
+import FormRow from "../../FormRow";
 import _ from "lodash";
 
 const questionsinitialStates = {
@@ -47,17 +54,24 @@ const CreateQuestion = ({
   moduleid,
   isOpen,
   onClosed,
+  module1,
   moduler,
-  setOnclosed,
+  setQuestion,
+  Question,
+  setModuleQuestion,
+  setModuleRetrieved,
 }) => {
   const paramname = paramsName;
   const courseId = courseid;
-  const [modules, setModules] = useState(initialState);
+  const [modules, setModules] = useState([]);
   const [questioner, setquestioners] = useState(questionsinitialStates);
   const [check, setCheck] = useState(null);
   const [modal, setModal] = useState({ show: false, msg: "", type: "" });
   const [modalOpen, setModalOpen] = useState(false);
-  const [questions, setQuestion] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [error, setError] = useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
   // const [Question, setQuestion] = useState([]);
   const [trigger, setTrigger] = useState(false);
   const [img, setImg] = useState(false);
@@ -71,45 +85,51 @@ const CreateQuestion = ({
   //console.log(paramname);
 
   const url = "/panel/admin_dashboard/view-module";
-  const {
-    _id,
-    title,
-    status,
-    party_type,
-    level,
-    completed,
-    featured,
-    description,
-    code,
-    image,
-    content,
-    createdBy,
-    createdAt,
-    updatedAt,
-  } = modules;
-  //console.log(typeof image);
+  // const {
+  //   _id,
+  //   title,
+  //   status,
+  //   party_type,
+  //   level,
+  //   completed,
+  //   featured,
+  //   description,
+  //   code,
+  //   image,
+  //   content,
+  //   createdBy,
+  //   createdAt,
+  //   updatedAt,
+  // } = module1;
+  //console.log(module1);
+
+  const selectModule = modules.filter((i) => i._id === moduleid);
+
+  //console.log(selectModule);
 
   const showModal = (show = false, msg = "", type = "") => {
     setModal(show, msg, type);
   };
   const Done = () => {
-    setOnclosed(true);
     onClosed();
 
-    router.push(`${url}/${paramname}/${courseId}`, {
-      shallow: true,
-    });
+    // router.push(`${url}/${paramname}/${courseId}`, {
+    //   shallow: true,
+    // });
   };
 
   const customStyles = {
     content: {
-      top: "0%",
-      left: "0%",
-      minWidth: "100vw",
-      minHeight: "100vh",
-      backgroundColor: "red",
+      position: "relative",
+      top: "9vh",
+      left: "18.5%",
+      maxWidth: "80%",
+      padding: "4%",
+      overflow: "auto",
+      maxHeight: "90vh",
+      backgroundColor: "hsl(112, 42%, 86%)",
       //   transform: "translate(-50%, -50%)",
-      zIndex: 2120,
+      zIndex: 0,
     },
   };
 
@@ -128,6 +148,9 @@ const CreateQuestion = ({
       // //   const updateQuestion = res.data.questions;
       const deletedId = questionData._id;
       const newQuestions = questions.filter((item) => item._id !== deletedId);
+      setQuestions(newQuestions);
+      setModuleQuestion(newQuestions);
+      setModuleRetrieved();
       setQuestion(newQuestions);
       // console.log(deletedId);
       // console.log(newQuestions);
@@ -152,7 +175,7 @@ const CreateQuestion = ({
 
         // const course = res.filter((i) => i._id === paramid);
         //console.log(questionData);
-        setQuestion(questionData);
+        setQuestions(questionData);
       } catch (error) {
         return { msg: error.response.data };
       }
@@ -173,50 +196,68 @@ const CreateQuestion = ({
       const fetchModule = async () => {
         try {
           const resp = await axios.get(
-            `http://localhost:8000/greendometech/ng/module/admin/view-module/${moduleid}`,
+            `http://localhost:8000/greendometech/ng/module/admin/course/view-module/${courseId}`,
             {
               withCredentials: true,
             }
           );
 
           const res = resp.data.modules;
-          const {
-            title,
-            _id,
-            status,
-            party_type,
-            level,
-            completed,
-            featured,
-            description,
-            code,
-            image,
-            content,
-            createdBy,
-            createdAt,
-            updatedAt,
-          } = res;
           // console.log(res);
-          setModules({
-            title,
-            _id,
-            status,
-            party_type,
-            level,
-            completed,
-            featured,
-            description,
-            code,
-            image,
-            content,
-            createdAt,
-            createdBy,
-            updatedAt,
-          });
+          // console.log(resp.data.modules);
+          // setRetrieve(resp.data);
+          setModules(res);
         } catch (error) {
-          return console.log(error?.response);
+          return { msg: error.response.data };
         }
       };
+      // const fetchModule = async () => {
+      //   try {
+      //     const resp = await axios.get(
+      //       `http://localhost:8000/greendometech/ng/module/admin/view-module/${moduleid}`,
+      //       {
+      //         withCredentials: true,
+      //       }
+      //     );
+
+      //     const res = resp.data.modules;
+      //     const {
+      //       title,
+      //       _id,
+      //       status,
+      //       party_type,
+      //       level,
+      //       completed,
+      //       featured,
+      //       description,
+      //       code,
+      //       image,
+      //       content,
+      //       createdBy,
+      //       createdAt,
+      //       updatedAt,
+      //     } = res;
+      //     // console.log(res);
+      //     setModules({
+      //       title,
+      //       _id,
+      //       status,
+      //       party_type,
+      //       level,
+      //       completed,
+      //       featured,
+      //       description,
+      //       code,
+      //       image,
+      //       content,
+      //       createdAt,
+      //       createdBy,
+      //       updatedAt,
+      //     });
+      //   } catch (error) {
+      //     return console.log(error?.response);
+      //   }
+      // };
       // const fetchQuestion = async () => {
       //   const res = await axios.get(
       //     `http://localhost:8000/greendometech/ng/module/assessment/all-questions/${moduleid}`,
@@ -253,7 +294,7 @@ const CreateQuestion = ({
 
       // fetchCourses();
     } catch (error) {
-      return console.log(error?.response);
+      return error?.response;
     }
   }, [moduler, check, trigger]);
 
@@ -281,6 +322,8 @@ const CreateQuestion = ({
     setquestioners({ ...questioner, [name]: value });
   };
   const handleEditQuestion = (id) => {
+    const question = questions?.filter((i) => i._id === id);
+    setSelectedQuestions(question);
     setModalOpen(true);
     setQuestionId(id);
   };
@@ -342,9 +385,12 @@ const CreateQuestion = ({
     if (!question || !a || !b || !c || !d || !answer) {
       toast.error("please fill out all details");
       return;
+    } else {
+      setError(true);
     }
+    setLoader(true);
     const fileType = file === undefined ? "" : file;
-    console.log(question);
+    //console.log(question);
 
     try {
       const res = await customFetch.post(
@@ -364,13 +410,20 @@ const CreateQuestion = ({
         }
       );
       const resp = { data: res.data, stats: res.status };
+      if (resp.stats === 201) {
+        setLoader(false);
+      }
       console.log(resp);
       setFile("");
       setCheck(res.data.question);
-      const questioner = res.data.question;
-      setQuestion([...questions, questioner]);
+      const questioner1 = res.data.question;
       //reset input field
       setquestioners({ question: "", a: "", b: "", c: "", d: "", answer: "" });
+      setQuestions([...questions, questioner1]);
+      setModuleQuestion([...questions, questioner1]);
+      setModuleRetrieved();
+      setQuestion([...questions, questioner1]);
+
       // setQuestion([...Question], resp.data.question);
     } catch (error) {
       return {
@@ -396,36 +449,95 @@ const CreateQuestion = ({
 
   return (
     <Modal style={customStyles} isOpen={isOpen} onRequestClose={onClosed}>
-      <section>
-        <h2>{`Module: ${title} `}</h2>
-        <div>
-          <div className="">
-            <div>
-              {image === undefined || image === "" ? (
-                <Image width={200} height={200} src={Greendome} alt="image" />
-              ) : (
-                <Image width={200} height={200} src={image} alt="image" />
-              )}
+      <div className=" relative  flex flex-col gap-y-5 rounded-sm p-5 bg-whiteOpaque shadow-default dark:border-strokedark dark:bg-boxdark">
+        {/* <h2 className=" text-greenGraded1 text-2xl ">{`welcome  ${username}, please view your profile`}</h2> */}
+        <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
+          <div className="relative mx-auto w-full max-w-30 rounded-full bg-greenGradedHov p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
+            <div className="relative flex flex-row top-10 justify-around item-center drop-shadow-2">
+              <div className=" flex items-center justify-center overflow-hidden h-28 w-32">
+                {module1?.image === undefined || module1?.image === "" ? (
+                  <Image width={100} height={100} src={Greendome} alt="image" />
+                ) : (
+                  <Image
+                    width={100}
+                    height={100}
+                    src={module1?.image}
+                    alt="image"
+                  />
+                )}
+              </div>
+              <PageTitle>{module1?.title}</PageTitle>
+              <button onClick={() => Done()}>Done</button>
             </div>
-            <h2>title: {title}</h2>
-            <h4>id: {_id}</h4>
-            <h4>status: {status}</h4>
-            <h4>party: {party_type}</h4>
-            <h4>level: {level}</h4>
-            <h4>completed: {_.toString(completed)}</h4>
-            <h4>featured: {_.toString(featured)}</h4>
-            <h4>description: {description}</h4>
-            <h4>code: {code}</h4>
-            <h4>content: {content}</h4>
-            <h4>createdBy: {createdBy}</h4>
-            <h4>createdAt: {createdAt}</h4>
-            <h4>updatedAt: {updatedAt}</h4>
+          </div>
+          <div className=" relative">
+            <div className="mx-auto mt-4.5 mb-5.5 grid max-w-94 grid-cols-2 rounded-md  py-2.5 shadow-1 dark:border-strokedark dark:">
+              {/* <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row"></div> */}
+              <div className=" relative top-5 flex justify-around items-center p-14 gap-y-3 flex-col">
+                <div className=" relative top-5 flex justify-center max-w-addCourse items-start gap-y-3 flex-col">
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">title:</h4> {module1?.title}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">code:</h4> {module1?.code}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">status:</h4> {module1?.status}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">party:</h4>
+                    {functionsSpace(module1?.party_type)}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">level:</h4>
+                    {module1?.level}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">completed:</h4>
+                    {_.toString(module1?.completed)}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">featured:</h4>
+                    {_.toString(module1?.featured)}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">description:</h4>
+                    {module1?.description}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">content:</h4> {module1?.content}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">Author:</h4> {module1?.createdBy}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">createdAt:</h4>{" "}
+                    {moment(module1?.createdAt).format("YYYY-MM-DD HH:MM:SS")}
+                  </div>
+                  <div className=" flex flex-row gap-x-2">
+                    <h4 className=" font-bold">updated:</h4>{" "}
+                    {moment(module1?.updatedAt).format("YYYY-MM-DD HH:MM:SS")}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* <div className=" relative top-10">
+                <p>Edit Profile</p>
+                <button onClick={() => setModalOpen({ editProfile: true })}>
+                  <AiFillSetting />
+                </button>
+              </div> */}
           </div>
         </div>
-      </section>
-      <section>
-        <form action="" onSubmit={handleSubmitQuestion}>
-          <div>set questions</div>
+      </div>
+      {loader && (
+        <div className=" flex items-center  min-w-innerlay3 h-96 top-full left-0 z-20 absolute ">
+          <Loading />
+        </div>
+      )}
+      <div className=" relative flex top-0 justify-center ">
+        <form className="px-4 py-3 mb-8 flex flex-col gap-y-4" action="">
+          <PageTitle>set questions</PageTitle>
           <FormRow
             type="file"
             accept="image/*"
@@ -446,124 +558,82 @@ const CreateQuestion = ({
               <Image width={200} height={200} src={file} alt="image" />
             )}
           </div>
-          <FormRow
-            type="text"
-            name="question"
-            value={questioner.question}
-            handleChange={handleQuestionChange}
-          />
-          <FormRow
-            type="text"
-            name="a"
-            value={questioner.a}
-            handleChange={handleQuestionChange}
-          />
-          <FormRow
-            type="text"
-            name="b"
-            value={questioner.b}
-            handleChange={handleQuestionChange}
-          />
-
-          <FormRow
-            type="text"
-            name="c"
-            value={questioner.c}
-            handleChange={handleQuestionChange}
-          />
-          <FormRow
-            type="text"
-            name="d"
-            value={questioner.d}
-            //   check={featured}
-            handleChange={handleQuestionChange}
-          />
-          <FormRow
-            type="text"
-            name="answer"
-            value={questioner.answer}
-            //   check={featured}
-            handleChange={handleQuestionChange}
-          />
-          <button style={{ position: "relative", left: "50%" }}>create</button>
+          <Label>
+            <FormRow
+              type="text"
+              name="question"
+              value={questioner.question}
+              handleChange={handleQuestionChange}
+              className=" w-80 p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name="a"
+              value={questioner.a}
+              handleChange={handleQuestionChange}
+              className=" w-72 p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name="b"
+              value={questioner.b}
+              handleChange={handleQuestionChange}
+              className=" w-72 p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name="c"
+              value={questioner.c}
+              handleChange={handleQuestionChange}
+              className=" w-72 p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name="d"
+              value={questioner.d}
+              //   check={featured}
+              handleChange={handleQuestionChange}
+              className=" w-72 p-2"
+            />
+          </Label>
+          <Label>
+            <FormRow
+              type="text"
+              name="answer"
+              value={questioner.answer}
+              //   check={featured}
+              handleChange={handleQuestionChange}
+              className=" w-72 p-2"
+            />
+          </Label>
+          <button onClick={handleSubmitQuestion} type="submit">
+            create
+          </button>
         </form>
-      </section>
-      <div>
-        <EditQuestion
-          onClosed={() => setModalOpen(false)}
-          isOpen={modalOpen}
-          moduleParam={moduleid}
-          courseid={courseid}
-          paramName={paramname}
-          questionParam={questionId}
-          Questions={questions}
-          setQuestion={setQuestion}
-        />
+        <div>
+          <EditQuestion
+            onClosed={() => setModalOpen(false)}
+            isOpen={modalOpen}
+            moduleParam={moduleid}
+            courseid={courseid}
+            paramName={paramname}
+            questionParam={questionId}
+            Questions={Question}
+            Questions1={questions}
+            Question={selectedQuestions}
+            setQuestions={setQuestions}
+            setQuestion={setQuestion}
+          />
+        </div>
       </div>
-      {questions?.length === 0 ? (
-        <h1> no question has been created</h1>
-      ) : (
-        <section>
-          {questions?.map((item, id) => {
-            const {
-              _id,
-              image,
-              question,
-              option1,
-              option2,
-              option3,
-              option4,
-              answer,
-              createdAt,
-              updatedAt,
-            } = item;
-
-            // console.log(image);
-
-            const url = "/panel/create-page-edit-question";
-            return (
-              <div key={id}>
-                <div className="">
-                  <div key={id}>
-                    {image !== "" && (
-                      <Image width={200} height={200} src={image} alt="image" />
-                    )}
-                  </div>
-
-                  <h2>questions: {question}</h2>
-                  <h2>questionsId: {_id}</h2>
-                  <h4>
-                    {`"(a)."`}
-                    {option1}
-                  </h4>
-                  <h4>
-                    {`"(b)."`} {option2}
-                  </h4>
-                  <h4>
-                    {`"(c)."`} {option3}
-                  </h4>
-                  <h4>
-                    {`"(d)."`} {option4}
-                  </h4>
-                  <h4>answer: {answer}</h4>
-                  <h4>createdAt: {createdAt}</h4>
-                  <h4>updatedAt: {updatedAt}</h4>
-                </div>
-
-                <button onClick={(e) => handleEditQuestion(_id)}>Edit</button>
-                {/* <Link
-                key={id}
-                href={`${url}/${paramname}/${courseId}/${moduleid}/${_id}`}
-              >
-                <button>Edit</button>
-              </Link> */}
-                <button onClick={() => deleteQuestion(_id)}>delete</button>
-              </div>
-            );
-          })}
-        </section>
-      )}
-      <button onClick={() => Done()}>Done</button>
     </Modal>
   );
 };

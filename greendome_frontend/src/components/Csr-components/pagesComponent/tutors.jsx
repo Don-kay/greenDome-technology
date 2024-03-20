@@ -1,9 +1,11 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAllUsers, setTutors } from "@/features/profile/profileSlice";
-import TutorProfileActions from "@/features/profile/tutorprofileActions.jsx";
+import { GetAllUsers, setTutors } from "../../../features/profile/profileSlice";
+import TutorProfileActions from "../../../features/profile/tutorprofileActions";
 import { TotalTutorsProps } from "../minuteComponents/sudentPops.jsx";
+import Loading from "../layout_constructs/loading";
+import { setLoading } from "../../../features/user/userSlice";
 import Greendome from "../../asset/greendome.jpg";
 import Image from "next/image";
 import StudentView from "./studentView.jsx";
@@ -18,12 +20,14 @@ const Tutors = () => {
   const [tutor, setTutor] = useState([]);
   const [tutorsId, setTutorsId] = useState();
   const { users } = useSelector((strore) => strore.profiles);
+  const { user, isLoading } = useSelector((strore) => strore.user);
   const [rowId, setRowId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeStudent, setactiveStudent] = useState([]);
   // console.log(users);
 
   useEffect(() => {
+    dispatch(setLoading(true));
     const fetchUsers = async () => {
       try {
         const profiles = await axios.get(
@@ -35,6 +39,12 @@ const Tutors = () => {
         );
         const resp = { data: profiles.data, stats: profiles.status };
         //  console.log(resp.data.user);
+        if (resp.stats === 200) {
+          dispatch(setLoading(false));
+        } else {
+          dispatch(setLoading(true));
+        }
+
         const data = resp.data.user;
 
         const tutorObj = data.filter((item) => {
@@ -157,10 +167,18 @@ const Tutors = () => {
         isOpen={modalOpen}
         studentid={tutorsId}
       />
+      {isLoading && (
+        <div className=" flex items-center  min-w-innerlay3 h-96 -top-32 left-0 z-20 absolute ">
+          <Loading />
+        </div>
+      )}
       <Box
         sx={{
           height: 400,
           width: "100%",
+          backgroundColor: "hsl(0, 14%, 97%)",
+          padding: "1.3rem",
+          borderRadius: "0.9rem",
         }}
       >
         <Typography

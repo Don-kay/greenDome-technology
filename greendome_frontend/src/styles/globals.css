@@ -11,6 +11,9 @@
     font-size: 2.125rem; /* 18px */
     line-height: 1.75rem; /* 28px */
   }
+  button {
+    border: solid, 0.5px, hsl(0, 0%, 68%, 0.7);
+  }
 }
 /* @layer components {
   div {
@@ -107,16 +110,25 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 body {
   color: none;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--foreground-rgb))
     )
     rgb(var(--foreground-rgb));
+}
+
+button {
+  border: #54d6ff33;
+  border: solid, 0.5px, hsl(0, 0%, 68%, 0.7);
 }
 
 a {

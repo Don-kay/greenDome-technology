@@ -12,12 +12,13 @@ const FormRow = ({
   handleOnBlur,
   pattern,
   maxLength,
+  className,
 }) => {
   return (
-    <div className="formrow">
-      <label htmlFor={name} className="form-label">
+    <div className="flex justify-start  items-center flex-row">
+      {/* <label htmlFor={name} className=" px-5 font-medium">
         {labelText || name}
-      </label>
+      </label> */}
       <input
         ref={userRef}
         id={name}
@@ -30,7 +31,7 @@ const FormRow = ({
         onChange={handleChange}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
-        className="form-input"
+        className={className}
         multiple={multiple}
         pattern={pattern}
         maxLength={maxLength}

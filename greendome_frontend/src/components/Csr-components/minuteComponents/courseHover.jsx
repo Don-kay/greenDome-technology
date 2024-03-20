@@ -1,17 +1,26 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAllUsers } from "@/features/profile/profileSlice";
+import { GetAllUsers } from "../../../features/profile/profileSlice";
 import _ from "lodash";
 import moment from "moment";
+import Image from "next/image";
+import Greendome from "../../asset/greendome.jpg";
 import Modal from "react-modal";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import ViewProfile from "@/features/profile/viewProfile";
-import { ProfileModal } from "@/features/functions/functionSlice";
+import ViewProfile from "../../../features/profile/viewProfile";
+import { ProfileModal } from "../../../features/functions/functionSlice";
 import SingleProfileView from "./SingleProfileView";
 
-const CourseHover = ({ studentCourse, isOpen, onClosed }) => {
+const CourseHover = ({
+  studentCourse,
+  studentCourses,
+  isOpen,
+  onClosed,
+  modalOpen,
+  RemoveCourse,
+}) => {
   const customStyles = {
     content: {
       position: "relative",
@@ -24,45 +33,109 @@ const CourseHover = ({ studentCourse, isOpen, onClosed }) => {
       zIndex: 2120,
     },
   };
-  // console.log(studentCourse);
+  // console.log(studentCourses);
   return (
-    <main>
-      <div onMouseOut={onClosed}>
-        {studentCourse?.map((item, id) => {
-          const {
-            _id,
-            name,
-            Serial_key,
-            description,
-            author,
-            fee,
-            updatedAt,
-            createdAt,
-            Party_Type,
-          } = item;
-          return (
-            <div
-              className=" flex justify-center cursor-pointer items-center flex-row"
-              key={id}
-            >
+    <main
+      className={
+        modalOpen
+          ? " relative -left-20 min-w-addCourse max-w-addCourse"
+          : " opacity-0"
+      }
+    >
+      {!studentCourses.length <= 0 ? (
+        <div onMouseOut={onClosed}>
+          {studentCourse?.map((item, idx) => {
+            const {
+              id,
+              image,
+              name,
+              Serial_key,
+              description,
+              author,
+              fee,
+              updatedAt,
+              createdAt,
+              Party_Type,
+            } = item;
+            //console.log(id);
+            const imageType = image === undefined || image === "" ? "" : image;
+            return (
               <div
-                key={id}
-                className=" flex justify-center items-center flex-row"
+                className=" flex justify-center bg-greenGraded items-center gap-y-2 cursor-pointer p-7  flex-col"
+                key={idx}
               >
-                <h2>{_id}</h2>
-                <h4>{Serial_key}</h4>
-                <h2>{name}</h2>
-                <h4>{description}</h4>
-                <h4>{author}</h4>
-                <h4>{fee}</h4>
-                <h4>{Party_Type}</h4>
-                <h4>{moment(updatedAt).format("YYYY-MM-DD HH:MM:SS")}</h4>
-                <h4>{moment(createdAt).format("YYYY-MM-DD HH:MM:SS")}</h4>
+                {imageType !== "" ? (
+                  <div className=" flex justify-center items-center m-3 overflow-hidden  w-24 h-auto rounded-full">
+                    <Image
+                      className=" h-24"
+                      width={100}
+                      height={140}
+                      src={imageType}
+                      alt="image"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center m-3 overflow-hidden  w-24 h-auto rounded-full">
+                    <Image
+                      width={100}
+                      height={100}
+                      src={Greendome}
+                      alt="image"
+                    />
+                  </div>
+                )}
+                <div className=" flex justify-start  gap-y-5 cursor-pointer p-10  flex-col">
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className="  font-medium text-white">serial key:</h3>
+                    <h4 className=" text-white"> {Serial_key}</h4>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className="  text-white font-medium">name:</h3>
+                    <h2 className=" text-white"> {name}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className="  text-white font-medium">description:</h3>
+                    <h4 className="  text-white max-w-innerlay">
+                      {" "}
+                      {description}
+                    </h4>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className="  text-white font-medium">author:</h3>
+                    <h4 className=" text-white"> {author}</h4>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className="  text-white font-medium">fee:</h3>
+                    <h4 className=" text-white"> {fee}</h4>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className="  text-white font-medium">party:</h3>
+                    <h4 className=" text-white"> {Party_Type}</h4>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className="  text-white font-medium">last updated:</h3>
+                    <h4 className=" text-white">
+                      {moment(updatedAt).format("YYYY-MM-DD HH:MM:SS")}
+                    </h4>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium  text-white">creeated:</h3>
+                    <h4 className=" text-white">
+                      {moment(createdAt).format("YYYY-MM-DD HH:MM:SS")}
+                    </h4>
+                  </div>
+                </div>
+                <button
+                  className="border-width1px text-white border-grey p-3 rounded-md bg-greenGraded1 hover:text-whiteHov"
+                  onClick={() => RemoveCourse(id)}
+                >
+                  remove course
+                </button>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      ) : null}
     </main>
   );
 };

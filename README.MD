@@ -1,3 +1,37 @@
+##### Greendome technology
+
+''' this is a full stack project, making use of technologies as :
+
+#### Back end technologies
+
+''' Node js, express js, cors, mongo db etc...
+
+#### Front-end technologies
+
+''' Npm, React js, Next js, tailwindCSS, redux js, react-redux, socket io etc...
+
+### FUNCTIONAITY
+
+''' This project permits you to login as a student and register for courses, or login as a tutor and create your courses. As an Admin you have full priviledges on the site.
+
+### React and next js FUNCTIONAITY
+
+### ADMIN LOGIN
+
+username: dkriz
+password: secret
+
+email: dkrizlive@gmail.com
+password: secret
+
+### STUDENT LOGIN
+
+username: willis
+password: secret
+
+email: dayowillis@gmail.com
+password: secret
+
 #### Setup
 
 ```bash

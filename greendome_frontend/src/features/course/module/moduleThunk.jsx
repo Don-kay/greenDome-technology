@@ -1,4 +1,4 @@
-import customFetch from "@/utilities/axios";
+import customFetch from "../../../utilities/axios";
 // import { cookies } from "next/headers";
 
 export const AllModulesThunk = async (_, thunkApi) => {

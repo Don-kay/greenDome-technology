@@ -63,24 +63,14 @@ App.useCors;
 // 4. create Route - to use app.use, you must import an app.use middleware and then attach the route variable
 App.use("/greendometech/ng/auth", AuthRouter);
 App.use("/greendometech/ng/module", Authentication, CourseRouter);
-App.use(
-  "/greendometech/ng/course",
-  Authentication,
-  AuthenticateRoles(Role_List.C1856, Role_List.A3769, Role_List.T5798),
-  ClassRouter
-);
+App.use("/greendometech/ng/course", Authentication, ClassRouter);
 App.use(
   "/greendometech/ng/finance",
   Authentication,
   AuthenticateRoles(Role_List.C1856),
   RatioRouter
 );
-App.use(
-  "/greendometech/ng/calendar",
-  Authentication,
-  AuthenticateRoles(Role_List.C1856, Role_List.A3769),
-  CalendarRouter
-);
+App.use("/greendometech/ng/calendar", Authentication, CalendarRouter);
 
 // 3. content to display information
 // App.get("/greendometech/ng/auth", (req, res) => {

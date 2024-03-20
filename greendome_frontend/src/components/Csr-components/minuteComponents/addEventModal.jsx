@@ -3,7 +3,9 @@ import { useState } from "react";
 import Modal from "react-modal";
 import Datetime from "react-datetime";
 import axios from "axios";
-import FormRow from "@/components/FormRow";
+import { Textarea } from "@roketid/windmill-react-ui";
+import TextARea from "../../TextArea";
+import FormRow from "../../FormRow";
 import Image from "next/image";
 import _ from "lodash";
 
@@ -22,13 +24,16 @@ const AddEventModal = ({ isOpen, onClosed, onEventAdded }) => {
 
   const customStyles = {
     content: {
-      top: "0%",
-      left: "0%",
-      minWidth: "100vw",
-      minHeight: "100vh",
-      backgroundColor: "red",
+      position: "relative",
+      top: "25vh",
+      left: "20%",
+      maxWidth: "70%",
+      padding: "3%",
+      overflow: "auto",
+      maxHeight: "90vh",
+      backgroundColor: "hsl(112, 42%, 86%)",
       //   transform: "translate(-50%, -50%)",
-      zIndex: 2120,
+      zIndex: 50,
     },
   };
   const handleImageFile = (e) => {
@@ -103,7 +108,12 @@ const AddEventModal = ({ isOpen, onClosed, onEventAdded }) => {
   };
 
   return (
-    <Modal style={customStyles} isOpen={isOpen} onRequestClose={onClosed}>
+    <Modal
+      className="rounded-md flex justify-center items-center flex-col border-y-greenui overflow-y-scroll scrollbar-thin scrollbar-track-metal scrollbar-thumb-dark scroll-p-10 "
+      style={customStyles}
+      isOpen={isOpen}
+      onRequestClose={onClosed}
+    >
       <button onClick={() => onClosed()}>Go Back</button>
 
       {trigger && <h2>{`input ${error}`}</h2>}
@@ -111,47 +121,63 @@ const AddEventModal = ({ isOpen, onClosed, onEventAdded }) => {
         style={{
           position: "relative",
           top: "80%",
-          left: "20%",
+          left: "0%",
           maxWidth: "50vw",
-          backgroundColor: "cornflowerblue",
+          // backgroundColor: "cornflowerblue",
         }}
+        className=" flex gap-x-64 justify-around items-center flex-row"
         onSubmit={onSubmit}
       >
-        <FormRow
-          type="text"
-          name="title"
-          value={title}
-          handleChange={(e) => setTitle(e.target.value)}
-        />
-        <FormRow
-          type="text"
-          name="description"
-          value={description || " "}
-          handleChange={(e) => setDescription(e.target.value)}
-        />
-        {/* <input
+        <div className=" flex gap-y-10 justify-start items-start flex-col">
+          <FormRow
+            type="text"
+            name="title"
+            value={title}
+            handleChange={(e) => setTitle(e.target.value)}
+            className="p-2"
+          />
+          <TextARea
+            value={description || " "}
+            type="text"
+            name="description"
+            handleChange={(e) => setDescription(e.target.value)}
+            className=" relative p-2 "
+          />
+          {/* <input
           style={{ zIndex: 1000 }}
           placeholder="Title"
           //   value={title}
           //   onChange={(e) => setTitle(e.target.value)}
         /> */}
-        <div>
-          <label>start date</label>
-          <Datetime value={nuStart} onChange={(date) => setNustart(date)} />
+          <div className=" flex flex-row gap-x-6">
+            <label className=" font-bold">start date</label>
+            <Datetime
+              value={nuStart}
+              onChange={(date) => setNustart(date)}
+              className="p-2"
+            />
+          </div>
+
+          <div className=" flex flex-row gap-x-6">
+            <label className=" font-bold">end date</label>
+            <Datetime
+              value={nuEnd}
+              className="p-2"
+              onChange={(date) => setNuend(date)}
+            />
+          </div>
+
+          <button className="btn z-50 hover:bg-greenGraded">Add event</button>
         </div>
 
-        <div>
-          <label>end date</label>
-          <Datetime value={nuEnd} onChange={(date) => setNuend(date)} />
-        </div>
-        <FormRow
-          type="file"
-          accept="image/*"
-          name="profile-image"
-          // value={values.password}
-          handleChange={handleImageFile}
-        />
-        <div>
+        <div className=" flex gap-y-10 justify-start items-start flex-col">
+          <FormRow
+            type="file"
+            accept="image/*"
+            name="profile-image"
+            // value={values.password}
+            handleChange={handleImageFile}
+          />
           {img && (
             <small style={{ color: "red" }}>
               image exceeds 1mb, choose another inage
@@ -163,7 +189,6 @@ const AddEventModal = ({ isOpen, onClosed, onEventAdded }) => {
             <Image width={200} height={200} src={file} alt="image" />
           )}
         </div>
-        <button>Add event</button>
       </form>
     </Modal>
   );

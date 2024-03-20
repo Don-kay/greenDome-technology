@@ -1,2 +1,8 @@
-export const ROlE_LIST = ["company", "Admin", "tutor", "student"];
-export const STUDENT_LIST = ["company", "Admin", "tutor"];
+export const Company = ["company", "Admin", "tutor", "student"];
+export const Admin = ["Admin"];
+export const AdminTutor = ["Admin", "tutor"];
+export const AdminStudent = ["Admin", "student"];
+export const AdminTutorStudent = [("Admin", "tutor", "student")];
+export const Tutor = ["tutor"];
+export const TutorStudent = ["tutor", "student"];
+export const Student = ["student"];

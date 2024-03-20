@@ -1,20 +1,38 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GetAllUsers } from "@/features/profile/profileSlice";
+import axios from "axios";
+import { GetAllUsers } from "../../../features/profile/profileSlice";
 import _ from "lodash";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import ViewProfile from "@/features/profile/viewProfile";
-import { ProfileModal } from "@/features/functions/functionSlice";
+import ViewProfile from "../../../features/profile/viewProfile";
+import { ProfileModal } from "../../../features/functions/functionSlice";
 import SingleProfileView from "./SingleProfileView";
 import Image from "next/image";
 import moment from "moment";
 
 const AllStaff = () => {
   const dispatch = useDispatch();
+  const [data, setData] = useState([]);
 
+  const fetchCourses = async () => {
+    try {
+      const resp = await axios.get(
+        "http://localhost:8000/greendometech/ng/course/admin/view-all-course",
+        {
+          withCredentials: true,
+        }
+      );
+
+      const Courses = resp.data.course;
+      setData(Courses);
+    } catch (error) {
+      return { msg: error?.response.data };
+    }
+  };
   useEffect(() => {
+    fetchCourses();
     dispatch(GetAllUsers());
     dispatch(ProfileModal({ bool: false }));
   }, []);
@@ -85,7 +103,7 @@ const AllStaff = () => {
   );
   return (
     <section>
-      <div>All Tutors</div>
+      <div>Management</div>
       <Box
         sx={{
           height: 400,
@@ -123,7 +141,7 @@ const AllStaff = () => {
       </Box>
       {profileView && (
         <div>
-          <SingleProfileView users={users} id={modalId} />
+          <SingleProfileView courses={data} users={users} id={modalId} />
         </div>
       )}
     </section>

@@ -5,12 +5,12 @@ import Link from "next/link";
 import { GrOverview } from "react-icons/gr";
 import { AiFillSetting, AiFillDelete, AiFillFileAdd } from "react-icons/ai";
 
-const ProfileActions = ({ params, onOpen, studentId }) => {
+const ProfileActions = ({ isAdmin, params, onOpen, studentId }) => {
   // const { users } = useSelector((strore) => strore.profiles);
   // console.log(studentId);
   const studentid = params.id;
   const route = "/panel/admin_dashboard/all-students";
-  const addRoute = "/panel/add-to-course/";
+  const addRoute = "/panel/admin_dashboard/add-to-course/";
   const handler = () => {
     studentId(studentid);
     onOpen();
@@ -30,21 +30,25 @@ const ProfileActions = ({ params, onOpen, studentId }) => {
         <Fab>
           <GrOverview />
         </Fab> */}
-      <Link href={`${addRoute}/${studentid}`}>
-        <Fab>
-          <AiFillFileAdd />
-        </Fab>
-      </Link>
+      {isAdmin ? (
+        <Link href={`${addRoute}/${studentid}`}>
+          <Fab>
+            <AiFillFileAdd />
+          </Fab>
+        </Link>
+      ) : null}
 
-      <Fab
-        color="primary"
-        sx={{
-          width: 40,
-          height: 40,
-        }}
-      >
-        <AiFillSetting />
-      </Fab>
+      {isAdmin ? (
+        <Fab
+          color="primary"
+          sx={{
+            width: 40,
+            height: 40,
+          }}
+        >
+          <AiFillSetting />
+        </Fab>
+      ) : null}
     </Box>
   );
 };

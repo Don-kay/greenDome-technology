@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+
 import { useSelector, useDispatch } from "react-redux";
 import ConfirmationModal from "../minuteComponents/confirmationModal";
-import functionsSpace from "@/features/functions/functions";
+import functionsSpace from "../../../features/functions/functions";
 import EditProfile from "./editProfile";
 import moment from "moment";
 import _ from "lodash";
@@ -14,7 +15,7 @@ import CreateQuestion from "./createQuestion";
 import EditModule from "./editModule";
 import UpdateDropDown from "../minuteComponents/updateDropDown";
 import Greendome from "../../asset/greendome.jpg";
-import { HoverModal } from "@/features/functions/functionSlice";
+import { HoverModal } from "../../../features/functions/functionSlice";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -34,7 +35,7 @@ const initialState = {
   createdAt: "",
   updatedAt: "",
 };
-const StudentView = ({ studentid, isOpen, onClosed }) => {
+const StudentView = ({ studentid, isOpen, onClosed, userID }) => {
   const dispatch = useDispatch();
   const [trigger, setTrigger] = useState(false);
   const [users, setUsers] = useState(initialState);
@@ -42,16 +43,17 @@ const StudentView = ({ studentid, isOpen, onClosed }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const { ishover } = useSelector((strore) => strore.functions);
 
-  // console.log(studentid);
+  //console.log(studentid);
   const customStyles = {
     content: {
       position: "relative",
-      top: "0vh",
-      left: "0%",
+      top: "10vh",
+      left: "18%",
       overflowY: "auto",
-      minWidth: "100vw",
-      maxHeight: "100vh",
-      backgroundColor: "red",
+      padding: "2.5rem",
+      maxWidth: "80%",
+      maxHeight: "80vh",
+      backgroundColor: "#edf0ec",
       //   transform: "translate(-50%, -50%)",
       zIndex: 2120,
     },
@@ -103,7 +105,7 @@ const StudentView = ({ studentid, isOpen, onClosed }) => {
           updatedAt,
         } = users;
         const img = image === undefined || image === "" ? "" : image;
-        // console.log(username);
+        //console.log(users);
         setUsers({
           id: _id,
           email,
@@ -160,9 +162,13 @@ const StudentView = ({ studentid, isOpen, onClosed }) => {
     return (
       <div key={id}>
         {imageType !== "" ? (
-          <Image width={200} height={200} src={image} alt="image" />
+          <div className="imgCont inline-block items-stretch m-3 overflow-hidden max-w-md h-20 ">
+            <Image width={100} height={100} src={image} alt="image" />
+          </div>
         ) : (
-          <Image width={200} height={200} src={Greendome} alt="image" />
+          <div className="imgCont inline-block items-stretch m-3 overflow-hidden max-w-md">
+            <Image width={100} height={100} src={Greendome} alt="image" />
+          </div>
         )}
         <h2 key={id}>title: {item.name}</h2>
         <small>id: {item._id}</small>
@@ -193,13 +199,25 @@ const StudentView = ({ studentid, isOpen, onClosed }) => {
     return (
       <tbody key={id}>
         <tr key={id} className="">
-          <td className=" text-center">{name}</td>
-          <td className=" text-center ">{Serial_key}</td>
-          <td className=" text-center ">{createdBy}</td>
-          <td className=" text-center ">{courseTutors}</td>
-          <td className=" text-center ">{fee}</td>
-          <td className=" text-center ">{parties}</td>
-          <td className=" text-center ">{author}</td>
+          <td className="  border-width1px border-grey  text-center font-medium">
+            {name}
+          </td>
+          <td className="  border-width1px border-grey text-center ">
+            {Serial_key}
+          </td>
+          <td className="  border-width1px border-grey text-center ">
+            {createdBy}
+          </td>
+          <td className="  border-width1px border-grey text-center ">
+            {courseTutors}
+          </td>
+          <td className="  border-width1px border-grey text-center ">{fee}</td>
+          <td className="  border-width1px border-grey text-center ">
+            {parties}
+          </td>
+          <td className="  border-width1px border-grey text-center ">
+            {author}
+          </td>
         </tr>
       </tbody>
     );
@@ -220,52 +238,91 @@ const StudentView = ({ studentid, isOpen, onClosed }) => {
       />
 
       <button onClick={() => onClosed()}>back</button>
-      <section>
+      <section className=" flex justify-center items-center flex-col ">
         <div>{`questions set to ${username}`}</div>
 
         <div className="">
           <div>
-            <p>{id}</p>
-            {imageType !== "" ? (
-              <Image width={200} height={200} src={image} alt="image" />
-            ) : (
-              <Image width={200} height={200} src={Greendome} alt="image" />
-            )}
-            <div>
-              <h3>Username: </h3> <h2>{username}</h2>
+            <div className=" flex item-center px-16 justify-between w-full bg-greenGraded flex-row ">
+              <p className=" relative top-10 text-white">{id}</p>
+              {imageType !== "" ? (
+                <div className=" flex justify-center items-center m-3 overflow-hidden  max-w-maxc h-24 rounded-full">
+                  <Image
+                    className=" h-24"
+                    width={100}
+                    height={140}
+                    src={image}
+                    alt="image"
+                  />
+                </div>
+              ) : (
+                <div className="imgCont inline-block items-stretch m-3 overflow-hidden max-w-md h-14 rounded-full">
+                  <Image width={100} height={100} src={Greendome} alt="image" />
+                </div>
+              )}
             </div>
-            <div>
-              <h3>firstname: </h3> <h2>{firstname}</h2>
-            </div>
-            <div>
-              <h3>Lastname: </h3> <h2>{lastname}</h2>
-            </div>
-            <div>
-              <h3>email: </h3> <h2>{email}</h2>
-            </div>
-            <div>
-              <h3>Mobile: </h3> <h2>{`+${phoneNumber}`}</h2>
-            </div>
-            <div>
-              <h3>Role: </h3> <h2>{Roles}</h2>
-            </div>
-            <div>
-              <h3>Active membership: </h3> <h2>{contentDisplay}</h2>
-            </div>
-            <div>
-              <h3>Biography: </h3> <h2>{biography}</h2>
-            </div>
-            <div>
-              <h3>Member since: </h3> <h2>{created}</h2>
-            </div>
-            <div>
-              <h3>Last Updated: </h3> <h2>{updated}</h2>
-            </div>
-            <div>
-              <h3>Certificate: </h3> <h2>{Certificate}</h2>
+            <div className=" flex justify-around items-center flex-row ">
+              <div>
+                <div className="  flex justify-start px-5 m-1 border-width1px border-grey items-center flex-row ">
+                  <h3 className=" font-medium">Username: </h3>{" "}
+                  <h2 className=" mx-7">{username}</h2>
+                </div>
+                <div className="  flex justify-start px-5 m-1 border-width1px  border-grey items-center flex-row">
+                  <h3 className=" font-medium">Lastname: </h3>{" "}
+                  <h2 className=" mx-7">{lastname}</h2>
+                </div>
+                <div className="  flex justify-start px-5 m-1 border-width1px  border-grey items-center flex-row ">
+                  <h3 className=" font-medium">Mobile: </h3>{" "}
+                  <h2 className=" mx-7">{`+${phoneNumber}`}</h2>
+                </div>
+                <div className="  flex justify-start px-5 p-5 m-1 border-width1px  border-grey items-center flex-col ">
+                  <h3 className=" font-medium">Active membership: </h3>{" "}
+                  <h2>{contentDisplay}</h2>
+                </div>
+                <div className="  flex justify-start px-5 m-1 border-width1px  border-grey items-center flex-row ">
+                  <h3 className=" font-medium">Member since: </h3>{" "}
+                  <h2 className=" mx-7">{created}</h2>
+                </div>
+              </div>
+
+              <div>
+                <div className="  flex justify-start p-5 m-1 border-width1px border-grey items-center flex-row ">
+                  <h3 className=" font-medium">firstname: </h3>{" "}
+                  <h2 className=" mx-7">{firstname}</h2>
+                </div>
+
+                <div className="  flex justify-start p-5 m-1 border-width1px border-grey items-center flex-row ">
+                  <h3 className=" font-medium">email: </h3>{" "}
+                  <h2 className=" mx-7">{email}</h2>
+                </div>
+
+                <div className="  flex justify-start p-5 m-1 border-width1px border-grey items-center flex-row ">
+                  <h3 className=" font-medium">Role: </h3>{" "}
+                  <h2 className=" mx-7">{Roles}</h2>
+                </div>
+
+                <div className="  flex justify-start p-5 m-1 border-width1px border-grey items-center flex-row ">
+                  <h3 className=" font-medium">Biography: </h3>{" "}
+                  <h2 className=" mx-7">{biography}</h2>
+                </div>
+
+                <div className="  flex justify-start p-5 m-1 border-width1px border-grey items-center flex-row ">
+                  <h3 className=" font-medium">Last Updated: </h3>{" "}
+                  <h2 className=" mx-7">{updated}</h2>
+                </div>
+                <div className="  flex justify-start p-5 m-1 border-width1px border-grey items-center flex-row ">
+                  <h3 className=" font-medium">Certificate: </h3>{" "}
+                  <h2 className=" mx-7">{Certificate}</h2>
+                </div>
+              </div>
             </div>
           </div>
-          <button onClick={() => toggleMenu()}>update user</button>
+          <button
+            className=" border-width1px border-grey bg-greenGradedHov"
+            onClick={() => toggleMenu()}
+          >
+            update user
+          </button>
           {ishover && (
             <div>
               {/* <button onClick={() => setDeleteHover(true)}>delete</button> */}
@@ -273,17 +330,25 @@ const StudentView = ({ studentid, isOpen, onClosed }) => {
             </div>
           )}
         </div>
-        <div>
+        <div className=" my-10">
           <table className=" max-w-thead p-responsive bg-purple border outline-zinc-400">
             <thead>
               <tr className="">
-                <th className="  bg-dark w-80">name</th>
-                <th className=" w-80">serial key</th>
-                <th className=" w-80">no. of students</th>
-                <th className=" w-80">instructors</th>
-                <th className=" w-80">fee</th>
-                <th className=" w-80">party-tpye</th>
-                <th className=" w-80">author</th>
+                <th className=" bg-greenGraded1 text-white w-80">name</th>
+                <th className="  bg-greenGraded1 text-white w-80">
+                  serial key
+                </th>
+                <th className="  bg-greenGraded1 text-white w-80">
+                  no. of students
+                </th>
+                <th className="  bg-greenGraded1 text-white w-80">
+                  instructors
+                </th>
+                <th className="  bg-greenGraded1 text-white w-80">fee</th>
+                <th className="  bg-greenGraded1 text-white w-80">
+                  party-tpye
+                </th>
+                <th className="  bg-greenGraded1 text-white w-80">author</th>
               </tr>
             </thead>
             {headers}

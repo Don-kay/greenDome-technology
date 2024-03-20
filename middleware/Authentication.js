@@ -13,14 +13,31 @@ const auth = (req, res, next) => {
   const token = AuthHeader.split("=")[1]; //token has all the user details
   //attach the user to course route
   try {
+    const verify = jwt.verify(token, process.env.JWT_SECRET, (err, res) => {
+      if (err) {
+        return "token expired";
+      }
+      return res;
+      // console.log(err, "error");
+      // console.log(res, "result");
+    });
+    // const ver = JSON.stringify(verify);
+    //console.log(verify);
+    if (verify === "token expired") {
+      //console.log(true);
+      return res.send({ status: "error", data: verify });
+    }
     const payload = jwt.verify(token, process.env.JWT_SECRET); //i had a bug with sign instead of verify and this caused user not been passes (err)
     //attach the authenticated user details to the req.user
+    // console.log(payload);
+    // console.log(verify);
     if (payload) {
       req.user = {
         userId: payload.userId,
         firstname: payload.firstname,
         username: payload.username,
         roles: payload.roles,
+        // token: verify,
       };
       // console.log(req.session);
       next();

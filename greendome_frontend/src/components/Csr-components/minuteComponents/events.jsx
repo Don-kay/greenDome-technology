@@ -4,15 +4,16 @@ import React, { useState, useRef, useReducer, useEffect, useMemo } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import AddEventModal from "../minuteComponents/addEventModal";
+
 import UpdateEventModal from "../minuteComponents/updateEventModal";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography } from "@mui/material";
-import { GetAllUsers } from "@/features/profile/profileSlice";
+import { GetAllUsers } from "../../../features/profile/profileSlice";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
-import ViewProfile from "@/features/profile/viewProfile";
-import CalendarFunction1 from "@/features/calendar/CalendarFunction1";
+import ViewProfile from "../../../features/profile/viewProfile";
+import CalendarFunction1 from "../../../features/calendar/CalendarFunction1";
 import SingleEventView from "./SingleEventView";
-import { ProfileModal } from "@/features/functions/functionSlice";
+import { ProfileModal } from "../../../features/functions/functionSlice";
 import Greendome from "../../asset/greendome.jpg";
 import Image from "next/image";
 import moment from "moment";
@@ -20,6 +21,10 @@ import axios from "axios";
 
 const AllEvent = () => {
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState({
+    addEvent: false,
+    viewEvent: false,
+  });
   const [event, setEvent] = useState([]);
   const { profileView, modalId } = useSelector((strore) => strore.functions);
   const dispatch = useDispatch();
@@ -106,11 +111,7 @@ const AllEvent = () => {
       headerName: "Settings",
       width: 220,
       renderCell: (params) => (
-        <CalendarFunction1
-          {...{ params }}
-          onclosed={(prop) => updateEventHandler(prop)}
-          ondelete={(prop) => deleteEventHandler(prop)}
-        />
+        <CalendarFunction1 isOpen={setModalOpen} {...{ params }} />
       ),
     },
   ]);
@@ -119,12 +120,18 @@ const AllEvent = () => {
   return (
     <section className=" flex justify-center flex-col">
       <div>Calendar</div>
-      <div className=" to-red-800 w-full h-fit">
+      {profileView ? (
+        <SingleEventView
+          isOpen={modalOpen.viewEvent}
+          onClosed={() => setModalOpen({ viewEvent: false })}
+          events={event}
+          id={modalId}
+        />
+      ) : null}
+      <div className=" w-full h-fit">
         <h1>Event Schedule</h1>
         <div>
-          <Box
-            sx={{ height: 700, width: "100%", backgroundColor: "goldenrod" }}
-          >
+          <Box sx={{ height: 500, width: "100%", backgroundColor: "" }}>
             <div className=" flex justify-center gap-2 flex-row">
               <Typography
                 variant="h5"
@@ -161,7 +168,7 @@ const AllEvent = () => {
               rows={EventList}
               getRowId={(row) => row.id}
               initialState={{
-                pagination: { paginationModel: { pageSize: 10 } },
+                pagination: { paginationModel: { pageSize: 5 } },
               }}
               pageSizeOptions={[5, 10, 25]}
               getRowSpacing={(params) => ({

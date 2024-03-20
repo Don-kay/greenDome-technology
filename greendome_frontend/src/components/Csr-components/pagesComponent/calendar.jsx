@@ -1,4 +1,5 @@
 import React, { useState, useRef, useReducer, useEffect, useMemo } from "react";
+import PageTitle from "../../typography/PageTitle";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import AddEventModal from "../minuteComponents/addEventModal";
@@ -6,21 +7,25 @@ import UpdateEventModal from "../minuteComponents/updateEventModal";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
-import ProfileActions from "@/features/profile/profileActions";
-import CalendarFunction from "@/features/calendar/CalendarFunction";
+import ProfileActions from "../../../features/profile/profileActions";
+import CalendarFunction from "../../../features/calendar/CalendarFunction";
 import SingleEventView from "../minuteComponents/SingleEventView";
-import { ProfileModal } from "@/features/functions/functionSlice";
+import { ProfileModal } from "../../../features/functions/functionSlice";
 import Greendome from "../../asset/greendome.jpg";
 import Image from "next/image";
 import moment from "moment";
 import axios from "axios";
 
-const Calendar = () => {
-  const [modalOpen, setModalOpen] = useState(false);
+const Calendar = ({ isStudent }) => {
+  const [modalOpen, setModalOpen] = useState({
+    addEvent: false,
+    viewEvent: false,
+  });
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [singleEvent, setSingleEvent] = useState("");
   const [deletedEvent, setDeletedEvent] = useState("");
   const [params, setParams] = useState("");
+  const [eventView, setEventview] = useState(false);
   const { profileView, modalId } = useSelector((strore) => strore.functions);
   const dispatch = useDispatch();
   const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
@@ -67,6 +72,7 @@ const Calendar = () => {
       title: item.title,
       start: item.start,
       end: item.end,
+      description: item.description,
       // uid: item.uid,
     };
   });
@@ -134,6 +140,9 @@ const Calendar = () => {
       renderCell: (params) => (
         <CalendarFunction
           {...{ params }}
+          isStudent={isStudent}
+          setEventview={setEventview}
+          isOpen={setModalOpen}
           onclosed={(prop) => updateEventHandler(prop)}
           ondelete={(prop) => deleteEventHandler(prop)}
         />
@@ -144,58 +153,65 @@ const Calendar = () => {
 
   return (
     <section className=" flex justify-center flex-col">
-      <div>Calendar</div>
-
-      <div>
-        <button className="btn" onClick={(e) => setModalOpen(true)}>
-          Add Event
-        </button>
-        <div
-        // style={
-        //   modalOpen
-        //     ? {
-        //         position: "relative",
-        //         left: "10%",
-        //         opacity: 0,
-        //       }
-        //     : {
-        //         position: "relative",
-        //         left: "10%",
-        //         opacity: 1,
-        //       }
-        // }
-        >
-          <FullCalendar
-            // ref={calendarRef}
-            height={"80vh"}
-            dayMinWidth={"20%"}
-            plugins={[dayGridPlugin]}
-            initialView="dayGridMonth"
-            events={event}
-            // weekends={false}
-          />
-        </div>
-        <AddEventModal
-          isOpen={modalOpen}
-          onClosed={() => setModalOpen(false)}
-          onEventAdded={(event1) => onEventAdded(event1)}
-        />
-        <UpdateEventModal
-          isOpen={updateModalOpen}
-          onClosed={() => setUpdateModalOpen(false)}
-          singleEvent={singleEvent}
-          params={params}
-          // update={forceUpdate}
+      <div className=" flex justify-around items-center flex-row">
+        {/* <div>Calendar</div> */}
+        {isStudent ? null : (
+          <button
+            className="btn z-50 hover:bg-greenGraded"
+            onClick={() => setModalOpen({ addEvent: true })}
+          >
+            Add Event
+          </button>
+        )}
+      </div>
+      <AddEventModal
+        isOpen={modalOpen.addEvent}
+        onClosed={() => setModalOpen({ addEvent: false })}
+        onEventAdded={(event1) => onEventAdded(event1)}
+      />
+      <UpdateEventModal
+        isOpen={updateModalOpen}
+        onClosed={() => setUpdateModalOpen(false)}
+        singleEvent={singleEvent}
+        params={params}
+        // update={forceUpdate}
+        events={event}
+        setEvent={setEvent}
+        // onEventAdded={(event1) => onEventAdded(event1)}
+      />
+      <div className=" z-20">
+        <FullCalendar
+          // ref={calendarRef}
+          height={"80vh"}
+          dayMinWidth={"80%"}
+          plugins={[dayGridPlugin]}
+          initialView="dayGridMonth"
           events={event}
-          setEvent={setEvent}
-          // onEventAdded={(event1) => onEventAdded(event1)}
+          // weekends={false}
         />
       </div>
-      <div className=" to-red-800 w-full h-fit">
-        <h1>Event Schedule</h1>
-        <div>
+      {profileView ? (
+        <SingleEventView
+          isOpen={modalOpen.viewEvent}
+          onClosed={() => setModalOpen({ viewEvent: false })}
+          onEventAdded={(event1) => onEventAdded(event1)}
+          events={event}
+          id={modalId}
+        />
+      ) : null}
+      <div className=" relative top-16 w-full h-fit">
+        <div className=" text-center">
+          <PageTitle>Event Schedule</PageTitle>
+        </div>
+        <div className=" relative top-28">
           <Box
-            sx={{ height: 700, width: "100%", backgroundColor: "goldenrod" }}
+            sx={{
+              height: 700,
+              width: "100%",
+              backgroundColor: "hsl(0, 14%, 97%)",
+              padding: "1.5rem",
+              zIndex: "0",
+            }}
           >
             <div className=" flex justify-center gap-2 flex-row">
               <Typography
@@ -246,11 +262,6 @@ const Calendar = () => {
           </Box>
         </div>
       </div>
-      {profileView && (
-        <div>
-          <SingleEventView events={event} id={modalId} />
-        </div>
-      )}
     </section>
   );
 };

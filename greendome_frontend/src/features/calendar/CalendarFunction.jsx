@@ -6,13 +6,26 @@ import { AiFillSetting, AiFillDelete } from "react-icons/ai";
 import { ProfileModal } from "../functions/functionSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const CalendarFunction = ({ params, onclosed, ondelete }) => {
+const CalendarFunction = ({
+  isOpen,
+  params,
+  onclosed,
+  ondelete,
+  isStudent,
+  setEventview,
+}) => {
   // const { users } = useSelector((strore) => strore.profiles);
   // console.log(studentId);
   const dispatch = useDispatch();
   const eventId = params.id;
   const displayEvents = (attendeesId) => {
     dispatch(ProfileModal({ id: attendeesId, bool: true }));
+  };
+
+  const dispatchFunction = () => {
+    displayEvents(eventId);
+    isOpen({ viewEvent: true });
+    //  setEventview(true);
   };
 
   // console.log(studentId);
@@ -26,17 +39,20 @@ const CalendarFunction = ({ params, onclosed, ondelete }) => {
         flexFlow: "row",
       }}
     >
-      <Fab
-        onClick={() => onclosed(eventId)}
-        color="primary"
-        sx={{
-          width: 40,
-          height: 40,
-        }}
-      >
-        <AiFillSetting />
-      </Fab>
-      <div onClick={() => displayEvents(eventId)}>
+      {isStudent === "true" ? null : (
+        <Fab
+          onClick={() => onclosed(eventId)}
+          color="primary"
+          sx={{
+            width: 40,
+            height: 40,
+          }}
+        >
+          <AiFillSetting />
+        </Fab>
+      )}
+
+      <div onClick={() => dispatchFunction()}>
         <Fab
           sx={{
             width: 40,
@@ -46,15 +62,17 @@ const CalendarFunction = ({ params, onclosed, ondelete }) => {
           <GrOverview />
         </Fab>
       </div>
-      <Fab
-        sx={{
-          width: 40,
-          height: 40,
-        }}
-        onClick={() => ondelete(eventId)}
-      >
-        <AiFillDelete />
-      </Fab>
+      {isStudent === "true" ? null : (
+        <Fab
+          sx={{
+            width: 40,
+            height: 40,
+          }}
+          onClick={() => ondelete(eventId)}
+        >
+          <AiFillDelete />
+        </Fab>
+      )}
     </Box>
   );
 };

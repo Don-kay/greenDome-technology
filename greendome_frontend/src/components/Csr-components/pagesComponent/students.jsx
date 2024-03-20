@@ -6,12 +6,15 @@ import {
   setStudents,
   setActiveStudent,
   setRefresh,
-} from "@/features/profile/profileSlice";
-import ProfileActions from "@/features/profile/profileActions.jsx";
+} from "../../../features/profile/profileSlice";
+
+import ProfileActions from "../../../features/profile/profileActions";
 import StudentView from "./studentView.jsx";
+import Loading from "../layout_constructs/loading";
 import TotalStudentPops, {
   ActiveStudentPops,
 } from "../minuteComponents/sudentPops.jsx";
+import { setLoading } from "../../../features/user/userSlice";
 import _ from "lodash";
 import Greendome from "../../asset/greendome.jpg";
 import Image from "next/image";
@@ -28,9 +31,20 @@ const Students = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const { users } = useSelector((strore) => strore.profiles);
   const [rowId, setRowId] = useState(null);
+
+  const { user, isLoading } = useSelector((strore) => strore.user);
+  const loggedInUserId = user.data.user.id;
+  const loggedInUser = users?.filter((i) => i.id === loggedInUserId);
+
+  const Admin = loggedInUser?.map((i) => {
+    return i.roles.includes("Admin");
+  });
+
+  const IsAdmin = _.toString(Admin);
   // console.log(users);
 
   useEffect(() => {
+    dispatch(setLoading(true));
     const fetchUsers = async () => {
       try {
         const profiles = await axios.get(
@@ -41,8 +55,13 @@ const Students = () => {
           }
         );
         const resp = { data: profiles.data, stats: profiles.status };
-        // console.log(resp.data.user);
+        console.log(resp.stats);
         const data = resp.data.user;
+        if (resp.stats === 200) {
+          dispatch(setLoading(false));
+        } else {
+          dispatch(setLoading(true));
+        }
 
         const studentObj = data.filter((item) => {
           return item.roles.includes("student");
@@ -87,7 +106,7 @@ const Students = () => {
     dispatch(GetAllUsers());
   }, [studentId]);
 
-  // console.log(users);
+  //console.log(users);
   // const User = users?.data;
   // const allUsers = User?.user;
 
@@ -164,6 +183,7 @@ const Students = () => {
         width: 220,
         renderCell: (params) => (
           <ProfileActions
+            isAdmin={IsAdmin}
             {...{ params }}
             onOpen={() => setModalOpen(true)}
             studentId={(id) => handleModalId(id)}
@@ -175,7 +195,7 @@ const Students = () => {
   );
 
   return (
-    <section className="panel relative top-10   h-screen bg-purple">
+    <section className="panel relative top-10 h-screen bg-purple">
       <div>board</div>
       <StudentView
         onClosed={() => setModalOpen(false)}
@@ -183,15 +203,25 @@ const Students = () => {
         studentid={studentId}
       />
       {/* <button onClick={() => view}>view all users</button> */}
+      {isLoading && (
+        <div className=" flex items-center  min-w-innerlay3 h-96 -top-32 left-0 z-20 absolute ">
+          <Loading />
+        </div>
+      )}
+
       <Box
         sx={{
-          height: 400,
+          height: "50vh",
           width: "100%",
+          backgroundColor: "hsl(0, 14%, 97%)",
+          padding: "1.3rem",
+          borderRadius: "0.9rem",
         }}
       >
         <Typography
           variant="h3"
           component="h3"
+          color="hsl(111.72413793103448, 49.15254237288135%, 11.568627450980392%)"
           sx={{ textAlign: "center", mt: 3, mb: 3 }}
         >
           manage students
@@ -210,6 +240,7 @@ const Students = () => {
           })}
         />
       </Box>
+
       <div className="relative top-40 flex items-center justify-around flex-row">
         <TotalStudentPops />
         <ActiveStudentPops />

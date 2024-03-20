@@ -14,7 +14,7 @@ import {
   Line,
 } from "recharts";
 
-const RevenueCharts = () => {
+const RevenueCharts = ({ course }) => {
   const rev = [
     { name: "ferry", value: 10000 },
     { name: "terry", value: 20000 },
@@ -31,23 +31,21 @@ const RevenueCharts = () => {
     { name: "derry", value: 80 },
   ];
   return (
-    <div className=" flex justify-center items-center flex-row max-w-minnelayer p-responsive2 min-h-fit relative bg-metal">
-      <div>
-        <h2>courseCharts</h2>
-        <PieChart
-          className=" relative top-1 outline p-responsive4 outline-dark"
-          width={430}
-          height={400}
-        >
+    <div className=" flex justify-center items-center flex-row max-w-minnelayer rounded-lg bg-whiteGraded p-responsive2 min-h-fit relative ">
+      <div className=" relative flex justify-center flex-col gap-y-5 top-1 rounded-lg p-responsive4 bg-greenGradedHov">
+        <h2 className="  text-greenGraded1 p-1 bg-whiteOpaque font-bold text-1xl">
+          courseCharts
+        </h2>
+        <PieChart width={430} height={400}>
           <Pie
-            className=" relative top-7 bg-purple"
+            className=" relative top-7"
             data={populate}
             dataKey="value"
             nameKey="name"
             cx={190}
             cy={190}
             outerRadius={90}
-            fill="#8884d8"
+            fill="#034e19b3"
           />
           <Pie
             data={rev}
@@ -57,19 +55,19 @@ const RevenueCharts = () => {
             cy={190}
             innerRadius={100}
             outerRadius={160}
-            fill="#82ca9d"
+            fill="#067c24"
             label
           />
           <Tooltip />
         </PieChart>
       </div>
-      <div className=" relative left-8">
-        <h2>RevenueCharts</h2>
+      <div className=" relative left-8 rounded-lg p-responsive4  bg-white text-1xl border-width1px border-grey">
+        <h2 className=" bg-white font-bold ">RevenueCharts</h2>
         <ComposedChart
-          width={730}
+          width={830}
           height={350}
           data={revenue}
-          className=" relative top-1 outline outline-dark"
+          className=" relative top-1 "
         >
           <XAxis dataKey="name" />
           <YAxis />

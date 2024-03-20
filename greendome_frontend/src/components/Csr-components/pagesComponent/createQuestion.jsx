@@ -1,18 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
+
 import axios from "axios";
-import customFetch from "@/utilities/axios";
+import customFetch from "../../../utilities/axios";
 import Image from "next/image";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+
 import Modal from "react-modal";
 import { useSelector, useDispatch } from "react-redux";
 import EditQuestion from "./editQuestion2";
 import Link from "next/link";
 import Greendome from "../../asset/greendome.jpg";
-import { resetErrorMsg } from "@/features/course/module/moduleSlice";
-import FormRow from "@/components/FormRow";
+import { resetErrorMsg } from "../../../features/course/module/moduleSlice";
+import FormRow from "../../FormRow";
 import _ from "lodash";
 
 const questionsinitialStates = {
@@ -100,13 +102,16 @@ const CreateQuestion = ({
 
   const customStyles = {
     content: {
-      top: "0%",
-      left: "0%",
-      minWidth: "100vw",
-      minHeight: "100vh",
-      backgroundColor: "red",
+      position: "relative",
+      top: "9vh",
+      left: "18.5%",
+      maxWidth: "80%",
+      padding: "4%",
+      overflow: "auto",
+      maxHeight: "90vh",
+      backgroundColor: "hsl(112, 42%, 86%)",
       //   transform: "translate(-50%, -50%)",
-      zIndex: 2120,
+      zIndex: 0,
     },
   };
 
@@ -370,37 +375,92 @@ const CreateQuestion = ({
   };
 
   return (
-    <Modal style={customStyles} isOpen={isOpen} onRequestClose={onClosed}>
-      <section>
-        <h2>{`Module: ${title} `}</h2>
-        <div>
-          <div className="">
-            <div>
-              {image === undefined || image === "" ? (
-                <Image width={200} height={200} src={Greendome} alt="image" />
-              ) : (
-                <Image width={200} height={200} src={image} alt="image" />
-              )}
+    <Modal
+      className={" flex justify-center items-center flex-col"}
+      style={customStyles}
+      isOpen={isOpen}
+      onRequestClose={onClosed}
+    >
+      <section className=" relative top-64 ">
+        <div className=" relative flex top-8  justify-center items-center gap-72 flex-row">
+          <h2>{`Module: ${title} `}</h2>
+          <div>
+            {image === undefined || image === "" ? (
+              <Image width={200} height={200} src={Greendome} alt="image" />
+            ) : (
+              <Image width={200} height={200} src={image} alt="image" />
+            )}
+          </div>
+          <button onClick={() => onClosed()}>Done</button>
+        </div>
+
+        <div className=" relative top-24 flex justify-around items-center gap-10 flex-row ">
+          <div className=" flex justify-center items-start gap-y-7 flex-col ">
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">title:</h3>
+              <h2 className=" text-17"> {title}</h2>
             </div>
-            <h2>title: {title}</h2>
-            <h4>id: {_id}</h4>
-            <h4>status: {status}</h4>
-            <h4>party: {party_type}</h4>
-            <h4>level: {level}</h4>
-            <h4>completed: {_.toString(completed)}</h4>
-            <h4>featured: {_.toString(featured)}</h4>
-            <h4>description: {description}</h4>
-            <h4>code: {code}</h4>
-            <h4>content: {content}</h4>
-            <h4>createdBy: {createdBy}</h4>
-            <h4>createdAt: {createdAt}</h4>
-            <h4>updatedAt: {updatedAt}</h4>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">title:</h3>
+              <h2 className=" text-17"> {_id}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">status:</h3>
+              <h2 className=" text-17"> {status}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">party:</h3>
+              <h2 className=" text-17"> {party_type}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">level: </h3>
+              <h2 className=" text-17"> {level}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">completed:</h3>
+              <h2 className=" text-17"> {_.toString(completed)}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">featured:</h3>
+              <h2 className=" text-17"> {_.toString(featured)}</h2>
+            </div>
+          </div>
+
+          <div className="  flex  justify-center items-start gap-y-7 flex-col ">
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">description:</h3>
+              <h2 className=" text-17"> {description}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">code:</h3>
+              <h2 className=" text-17"> {code}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">content:</h3>
+              <h2 className=" text-17"> {content}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">createdBy:</h3>
+              <h2 className=" text-17"> {createdBy}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">createdAt: </h3>
+              <h2 className=" text-17"> {createdAt}</h2>
+            </div>
+            <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+              <h3 className=" font-medium">updatedAt:</h3>
+              <h2 className=" text-17"> {updatedAt}</h2>
+            </div>
           </div>
         </div>
       </section>
-      <section>
-        <form action="" onSubmit={handleSubmitQuestion}>
-          <div>set questions</div>
+      <section className=" relative flex my-2 top-96 justify-center items-center flex-col">
+        <div>set questions</div>
+        <form
+          className=" relative top-5 flex justify-center items-start gap-y-3 flex-col"
+          action=""
+          onSubmit={handleSubmitQuestion}
+        >
           <FormRow
             type="file"
             accept="image/*"
@@ -460,8 +520,10 @@ const CreateQuestion = ({
             //   check={featured}
             handleChange={handleQuestionChange}
           />
-          <button style={{ position: "relative", left: "50%" }}>create</button>
         </form>
+        <button style={{ position: "relative", top: "5vh", zIndex: 20 }}>
+          create
+        </button>
       </section>
       <div>
         <EditQuestion
@@ -475,66 +537,92 @@ const CreateQuestion = ({
           setQuestion={setQuestion}
         />
       </div>
-      <section>
-        {Question?.map((item, id) => {
-          const {
-            _id,
-            image,
-            question,
-            option1,
-            option2,
-            option3,
-            option4,
-            answer,
-            createdAt,
-            updatedAt,
-          } = item;
+      {Question?.length === 0 ? (
+        <h1 className=" relative flex my-2 top-80 justify-center items-center">
+          no question has been created
+        </h1>
+      ) : (
+        <section className=" grid grid-cols-3 gap-x-20 relative top-96">
+          {Question?.map((item, id) => {
+            const {
+              _id,
+              image,
+              question,
+              option1,
+              option2,
+              option3,
+              option4,
+              answer,
+              createdAt,
+              updatedAt,
+            } = item;
 
-          // console.log(image);
+            // console.log(image);
 
-          const url = "/panel/create-page-edit-question";
-          return (
-            <div key={id}>
-              <div className="">
-                <div key={id}>
-                  {image !== "" && (
-                    <Image width={200} height={200} src={image} alt="image" />
-                  )}
+            const url = "/panel/create-page-edit-question";
+            return (
+              <div className=" relative top-44 " key={id}>
+                <div className=" flex justify-center items-start gap-y-3 flex-col ">
+                  <div key={id}>
+                    {image !== "" && (
+                      <Image width={200} height={200} src={image} alt="image" />
+                    )}
+                  </div>
+
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium">questions:</h3>
+                    <h2 className=" text-17"> {question}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium">questionsId:</h3>
+                    <h2 className=" text-17"> {_id}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium">{`"(a)."`}</h3>
+                    <h2 className=" text-17"> {option1}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium">{`"(b)."`}</h3>
+                    <h2 className=" text-17"> {option2}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium">{`"(c)."`}</h3>
+                    <h2 className=" text-17"> {option3}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium">{`"(d)."`}</h3>
+                    <h2 className=" text-17"> {option4}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium">answer:</h3>
+                    <h2 className=" text-17"> {answer}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium">createdAt: </h3>
+                    <h2 className=" text-17"> {createdAt}</h2>
+                  </div>
+                  <div className=" flex justify-start  gap-x-5 cursor-pointer  flex-row">
+                    <h3 className=" font-medium"> updatedAt:</h3>
+                    <h2 className=" text-17"> {updatedAt}</h2>
+                  </div>
                 </div>
 
-                <h2>questions: {question}</h2>
-                <h2>questionsId: {_id}</h2>
-                <h4>
-                  {`"(a)."`}
-                  {option1}
-                </h4>
-                <h4>
-                  {`"(b)."`} {option2}
-                </h4>
-                <h4>
-                  {`"(c)."`} {option3}
-                </h4>
-                <h4>
-                  {`"(d)."`} {option4}
-                </h4>
-                <h4>answer: {answer}</h4>
-                <h4>createdAt: {createdAt}</h4>
-                <h4>updatedAt: {updatedAt}</h4>
-              </div>
+                <div className=" relative flex my-5 justify-center items-center gap-12 flex-row">
+                  <button onClick={(e) => handleEditQuestion(_id)}>Edit</button>{" "}
+                  <button onClick={() => deleteQuestion(_id)}>delete</button>
+                </div>
 
-              <button onClick={(e) => handleEditQuestion(_id)}>Edit</button>
-              {/* <Link
+                {/* <Link
                 key={id}
                 href={`${url}/${paramname}/${courseId}/${moduleid}/${_id}`}
               >
                 <button>Edit</button>
               </Link> */}
-              <button onClick={() => deleteQuestion(_id)}>delete</button>
-            </div>
-          );
-        })}
-      </section>
-      <button onClick={() => onClosed()}>Done</button>
+              </div>
+            );
+          })}
+        </section>
+      )}
     </Modal>
   );
 };

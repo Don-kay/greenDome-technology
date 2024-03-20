@@ -1,6 +1,7 @@
 import React from "react";
+
 import axios from "axios";
-import ModuleView from "@/components/Csr-components/pagesComponent/moduleView";
+import ModuleView from "../../../../../../../../components/Csr-components/pagesComponent/moduleView";
 import _ from "lodash";
 
 const moduleDisp = async (req) => {

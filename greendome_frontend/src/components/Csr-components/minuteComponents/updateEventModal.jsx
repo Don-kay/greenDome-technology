@@ -4,7 +4,10 @@ import Modal from "react-modal";
 import Datetime from "react-datetime";
 import Image from "next/image";
 import axios from "axios";
-import FormRow from "@/components/FormRow";
+import TextARea from "../../TextArea";
+import PageTitle from "../../typography/PageTitle";
+
+import FormRow from "../../FormRow";
 import _ from "lodash";
 
 const UpdateEventModal = ({
@@ -28,7 +31,7 @@ const UpdateEventModal = ({
   const [img, setImg] = useState(false);
 
   const image = !eImage ? "" : eImage;
-
+  //console.log(singleEvent);
   useEffect(() => {
     if (etitle === "undefined") {
       return;
@@ -44,13 +47,16 @@ const UpdateEventModal = ({
 
   const customStyles = {
     content: {
-      top: "0%",
-      left: "0%",
-      minWidth: "100vw",
-      minHeight: "100vh",
-      backgroundColor: "green",
+      position: "relative",
+      top: "25vh",
+      left: "20%",
+      maxWidth: "70%",
+      padding: "3%",
+      overflow: "auto",
+      maxHeight: "90vh",
+      backgroundColor: "hsl(112, 42%, 86%)",
       //   transform: "translate(-50%, -50%)",
-      zIndex: 2120,
+      zIndex: 50,
     },
   };
 
@@ -115,26 +121,75 @@ const UpdateEventModal = ({
   };
 
   return (
-    <Modal style={customStyles} isOpen={isOpen} onRequestClose={onClosed}>
+    <Modal
+      className="rounded-md flex justify-center items-center flex-col border-y-greenui overflow-y-scroll scrollbar-thin scrollbar-track-metal scrollbar-thumb-dark scroll-p-10 "
+      style={customStyles}
+      isOpen={isOpen}
+      onRequestClose={onClosed}
+    >
+      <PageTitle>Update Event</PageTitle>
       <button onClick={() => onClosed()}>Go Back</button>
       <form
         style={{
           position: "relative",
           top: "80%",
-          left: "20%",
+          left: "0%",
           maxWidth: "50vw",
-          backgroundColor: "cornflowerblue",
         }}
+        className=" flex gap-x-64 justify-around items-center flex-row"
         onSubmit={onSubmit}
       >
-        <FormRow
-          type="file"
-          accept="image/*"
-          name="profile-image"
-          // value={url}
-          handleChange={handleImageFile}
-        />
-        <div>
+        <div className=" flex gap-y-10 justify-center items-start flex-col">
+          <FormRow
+            type="text"
+            name="title"
+            value={title || " "}
+            handleChange={(e) => setTitle(e.target.value)}
+            className="p-2"
+          />
+          <TextARea
+            value={description || " "}
+            type="text"
+            name="description"
+            handleChange={(e) => setDescription(e.target.value)}
+            className="h-32 w-72 p-2"
+          />
+          {/* <input
+          style={{ zIndex: 1000 }}
+          placeholder="Title"
+          //   value={title}
+          //   onChange={(e) => setTitle(e.target.value)}
+        /> */}
+          <div className=" flex flex-row gap-x-6">
+            <label className=" font-bold">start date</label>
+            <Datetime
+              value={nuStart || " "}
+              onChange={(date) => setNustart(date)}
+              className=" p-2"
+            />
+          </div>
+
+          <div className=" flex flex-row gap-x-6">
+            <label className=" font-bold">end date</label>
+            <Datetime
+              value={nuEnd || " "}
+              onChange={(date) => setNuend(date)}
+              className="p-2"
+            />
+          </div>
+          <button className="btn z-50 hover:bg-greenGraded">
+            update event
+          </button>
+        </div>
+
+        <div className=" flex gap-y-10 justify-start items-start flex-col">
+          <FormRow
+            type="file"
+            accept="image/*"
+            name="profile-image"
+            // value={url}
+            handleChange={handleImageFile}
+          />
           {img && (
             <small style={{ color: "red" }}>
               image exceeds 1mb, choose another inage
@@ -144,37 +199,6 @@ const UpdateEventModal = ({
             <Image width={200} height={200} src={file} alt="image" />
           )}
         </div>
-        <FormRow
-          type="text"
-          name="title"
-          value={title || " "}
-          handleChange={(e) => setTitle(e.target.value)}
-        />
-        <FormRow
-          type="text"
-          name="description"
-          value={description || " "}
-          handleChange={(e) => setDescription(e.target.value)}
-        />
-        {/* <input
-          style={{ zIndex: 1000 }}
-          placeholder="Title"
-          //   value={title}
-          //   onChange={(e) => setTitle(e.target.value)}
-        /> */}
-        <div>
-          <label>start date</label>
-          <Datetime
-            value={nuStart || " "}
-            onChange={(date) => setNustart(date)}
-          />
-        </div>
-
-        <div>
-          <label>end date</label>
-          <Datetime value={nuEnd || " "} onChange={(date) => setNuend(date)} />
-        </div>
-        <button>Add event</button>
       </form>
     </Modal>
   );
