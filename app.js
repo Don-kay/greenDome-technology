@@ -59,6 +59,15 @@ App.use(
 App.use(express.json());
 
 App.use(cors({ origin: "http://localhost:3000", credentials: true }));
+// App.use(
+//   cors({
+//     origin:
+//       process.env.NODE_ENV !== "production"
+//         ? "http://localhost:3000"
+//         : "http://greendometech.com",
+//     credentials: true,
+//   })
+// );
 App.useCors;
 // 4. create Route - to use app.use, you must import an app.use middleware and then attach the route variable
 App.use("/greendometech/ng/auth", AuthRouter);
@@ -82,6 +91,8 @@ App.use(notFoundMiddleware);
 App.use(errorHandlerMiddleware);
 //connect to mongodb
 const port = process.env.PORT || 8000;
+const hostname =
+  process.env.NODE_ENV !== "production" ? 8000 : "greendometech.com";
 
 // 2. function to run http server
 const start = async (req, res) => {
