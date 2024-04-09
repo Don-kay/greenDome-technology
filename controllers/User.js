@@ -355,6 +355,8 @@ const UpdateProfile = async (req, res) => {
       certificate: user.certificate,
       roles: user.roles,
       image: user.image,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     },
   });
 };
@@ -391,6 +393,8 @@ const UpdateAllProfile = async (req, res) => {
         certificate: user.certificate,
         roles: user.roles,
         image: user.image,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
     });
   } else {

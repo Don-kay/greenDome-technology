@@ -12,6 +12,7 @@ import { GetAllUsers } from "../../../../features/profile/profileSlice";
 import {
   toggleSubmenu,
   ToggleTrigger2,
+  Status,
 } from "../../../../features/functions/functionSlice";
 import { toggleSideBar } from "../../../../features/functions/functionSlice";
 import { SidebarEl, studentSidebarEl } from "../../../data/elements";
@@ -19,6 +20,7 @@ import Dennis from "../../../asset/dennis.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import css from "../../../../app/panel/style.module.css";
 import { SidebarItems } from "./SidebarItems";
+import { usePathname } from "next/navigation";
 import { SidebarHeader } from "./SidebarHeader";
 import { useDashboardContext } from "../../../../app/panel/Provider";
 
@@ -35,30 +37,36 @@ const style = {
   container: " relative top-14 pb-32 lg:pb-6",
   open: "absolute w-8/12 z-40 sm:w-5/12",
   default:
-    "bg-green shadow h-screen overflow-y-auto top-0 lg:block lg:relative lg:w-64 lg:z-auto",
+    "bg-green shadow h-screen overflow-y-auto z-50 top-0 lg:block lg:relative lg:w-64 lg:z-auto",
   default1:
-    "bg-pink shadow h-screen overflow-y-auto top-0 lg:block lg:relative lg:w-64 lg:z-auto",
+    "bg-pink shadow h-screen overflow-y-auto z-50 top-0 lg:block lg:relative lg:w-64 lg:z-auto",
 };
 
 export const Sidebar = ({ mobileOrientation, IsAdmin, IsStudent }) => {
   const dispatch = useDispatch();
-  const { isSubmenuOpen, isSideBarOpen, triggers, triggers2 } = useSelector(
+  const { isSubmenuOpen, isSideBarOpen, triggers, isStatus } = useSelector(
     (state) => state.functions
   );
   const { user } = useSelector((strore) => strore.user);
   const { users } = useSelector((strore) => strore.profiles);
   const [modalOpen, setModalOpen] = useState(false);
+  const [tweaked, setTweaked] = useState(false);
+  const pathname = usePathname();
   const [photo, setPhoto] = useState();
   const [trigger, setTrigger] = useState(false);
   const [Params, setParams] = useState();
   const { sidebarOpen } = useDashboardContext();
 
-  //console.log(triggers);
+  const isAdminDashboard = pathname.startsWith("/panel/admin_dashboard/");
+  // console.log(isAdminDashboard);
+  // console.log(pathname);
+  // console.log(isStatus);
+  // console.log(updateImgtweak);
 
   useEffect(() => {
-    //console.log(user);
+    dispatch(Status(""));
+    // console.log(performance.getEntriesByType("navigation")[0].type);
     setTrigger(true);
-    //console.log(users);
     dispatch(GetAllUsers());
     const loggedInUserId = user?.data.user.id;
     try {
@@ -68,17 +76,29 @@ export const Sidebar = ({ mobileOrientation, IsAdmin, IsStudent }) => {
       const Params = loggedInUserId;
       const User = loggedInUser[0];
       if (users !== undefined) {
-        setPhoto(User.image);
         setTrigger(false);
         setParams(Params);
+        if (isStatus === "") {
+          setPhoto(User.image);
+        } else {
+          null;
+        }
       }
     } catch (error) {
       return error.msg;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    //console.log(User.image);
+  useEffect(() => {
+    dispatch(Status(""));
+    dispatch(GetAllUsers());
+    if (isStatus === 200) {
+      setTrigger(true);
+    }
 
     const fetchUsers = async () => {
+      //setTrigger(true);
       try {
         const res = await customFetch.get("/auth/users", {
           withCredentials: true,
@@ -90,8 +110,11 @@ export const Sidebar = ({ mobileOrientation, IsAdmin, IsStudent }) => {
         const profile = users.filter((i) => i.id === Params);
         const profilePhoto = _.toString(profile.map((i) => i.image));
         //console.log(users);
-        if (triggers) {
+
+        if (isStatus === 200) {
           setPhoto(profilePhoto);
+        } else {
+          null;
         }
 
         if (profilePhoto !== "") {
@@ -105,30 +128,36 @@ export const Sidebar = ({ mobileOrientation, IsAdmin, IsStudent }) => {
       }
     };
 
-    // fetchUsers();
-  }, [triggers]);
+    fetchUsers();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggers]);
+  // console.log("User.image");
   const isStudent = _.toString(IsStudent);
   const isAdmin = _.toString(IsAdmin);
   return (
     <aside
       className={
-        IsStudent
-          ? `${style.default1} 
+        isAdminDashboard
+          ? `${style.default} 
         ${style.mobileOrientation[mobileOrientation]} 
         ${sidebarOpen ? style.open : style.close} ${css.scrollbar}`
-          : `${style.default} 
+          : `${style.default1} 
         ${style.mobileOrientation[mobileOrientation]} 
         ${sidebarOpen ? style.open : style.close} ${css.scrollbar}`
       }
     >
-      <EditProfile onClosed={() => setModalOpen(false)} isOpen={modalOpen} />
+      {/* <EditProfile
+        onClosed={() => setModalOpen(false)}
+        isOpen={modalOpen}
+      /> */}
       <div className={style.container}>
         <SidebarHeader trigger={trigger} profileImg={photo} />
         <SidebarItems
           studentViewData={studentSidebarEl}
           viewData={SidebarEl}
           isStudent={isStudent}
+          isAdmindashboard={isAdminDashboard}
           isAdmin={isAdmin}
           params={Params}
         />

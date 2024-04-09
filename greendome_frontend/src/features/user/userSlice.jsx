@@ -6,6 +6,7 @@ import { addUserLocalStorage } from "../../utilities/localStorage";
 // const { setToken, setStatus, setRole } = useGlobalContext();
 const initialState = {
   isLoading: false,
+  isLoading1: false,
   successMsg: "",
   user: "",
   role: [],
@@ -55,7 +56,7 @@ const userSlice = createSlice({
     },
     [registerUser.fulfilled]: (state, action) => {
       const { payload } = action;
-      console.log(payload);
+      //console.log(payload);
       const name = payload.user;
       state.user = name;
       state.isLoading = false;
@@ -72,7 +73,7 @@ const userSlice = createSlice({
     },
     [loginUserEmail.fulfilled]: (state, action) => {
       const { payload } = action;
-      console.log(payload);
+      //console.log(payload);
       const data = { data: payload.data, stats: payload.stats };
       state.user = data;
       state.status = data.stats;
@@ -83,7 +84,7 @@ const userSlice = createSlice({
     },
     [loginUserEmail.rejected]: (state, action) => {
       const { payload } = action;
-      console.log(payload);
+      //console.log(payload);
       state.isLoading = false;
       state.errorMsg = payload?.msg;
       state.status = payload?.stats;
@@ -95,7 +96,7 @@ const userSlice = createSlice({
     },
     [loginUsername.fulfilled]: (state, action) => {
       const { payload } = action;
-      console.log(payload);
+      //console.log(payload);
       const data = { data: payload.data, stats: payload.stats };
       state.user = data;
       state.status = data.stats;
@@ -106,7 +107,7 @@ const userSlice = createSlice({
     },
     [loginUsername.rejected]: (state, action) => {
       const { payload } = action;
-      console.log(payload);
+      //console.log(payload);
       state.isLoading = false;
       state.errorMsg = payload?.msg;
       state.status = payload?.stats;

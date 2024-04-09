@@ -16,7 +16,7 @@ import moment from "moment";
 const AllAttendees = () => {
   const dispatch = useDispatch();
   const [trigger, setTrigger] = useState(false);
-  const [user, setUser] = useState([]);
+  const [allAttendees, setAllattendees] = useState([]);
   const { users, errorMsg } = useSelector((strore) => strore.profiles);
   const { profileView, modalId } = useSelector((strore) => strore.functions);
   useEffect(() => {
@@ -35,25 +35,39 @@ const AllAttendees = () => {
     //   }
     // };
     // fetchUsers();
+
+    try {
+      if (users === undefined || users?.length === 0) {
+        setTrigger(true);
+      } else {
+        const allAttendee = users?.map((item) => {
+          return {
+            image: item.image,
+            id: item.id,
+            email: item.email,
+            username: item.username,
+            roles: _.toString(item.roles),
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
+          };
+
+          // item.roles, item.id;
+        });
+        setAllattendees(allAttendee);
+        setTrigger(false);
+      }
+    } catch (error) {
+      return error;
+    }
+
     dispatch(GetAllUsers());
     dispatch(ProfileModal({ bool: false }));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // console.log(users);
-  const [rowId, setRowId] = useState(null);
-
-  const allAttendees = users?.map((item) => {
-    return {
-      image: item.image,
-      id: item.id,
-      email: item.email,
-      username: item.username,
-      roles: _.toString(item.roles),
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-    };
-    // item.roles, item.id;
-  });
+  //console.log("users");
+  const [rowId] = useState(null);
 
   const columns = useMemo(
     () => [
@@ -97,9 +111,9 @@ const AllAttendees = () => {
         width: 220,
         renderCell: (params) =>
           moment(params.row.updatedAt).format("YYYY-MM-DD HH:MM:SS"),
-      },
+      }, // eslint-disable-next-line react-hooks/exhaustive-deps
     ],
-    [rowId]
+    []
   );
   return (
     <section className="  ">
@@ -117,7 +131,11 @@ const AllAttendees = () => {
         >
           view all attendees
         </Typography>
-        {users?.length !== 0 ? (
+        {trigger ? (
+          <div className=" flex justify-center items-center relative top-36  h-72 w-full ">
+            <h1 className=" text-align">no user available</h1>
+          </div>
+        ) : (
           <DataGrid
             columns={columns}
             rows={allAttendees}
@@ -137,8 +155,6 @@ const AllAttendees = () => {
               bottom: params.isLastVisible ? 0 : 5,
             })}
           />
-        ) : (
-          <h1>no user available</h1>
         )}
       </Box>
       {profileView && (

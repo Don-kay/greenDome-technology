@@ -77,13 +77,26 @@ export default function middleware(req, res) {
   let isTutor = false;
 
   //console.log(jwt === undefined);
+  const env = process.env.NODE_ENV;
+
   if (
-    (jwt === undefined && isNotLoginRoute(pathname)) ||
+    (jwt === undefined && isNotLoginRoute(pathname) && env == "development") ||
     (decodedToken.exp * 1000 < currentDate.getTime() &&
-      isNotLoginRoute(pathname))
+      isNotLoginRoute(pathname) &&
+      env == "development")
   ) {
     return NextResponse.redirect("http://localhost:3000/dome/login");
+  } else if (
+    (jwt === undefined && isNotLoginRoute(pathname) && env == "production") ||
+    (decodedToken.exp * 1000 < currentDate.getTime() &&
+      isNotLoginRoute(pathname) &&
+      env == "production")
+  ) {
+    return NextResponse.redirect(
+      "https://greendometech.netlify.app/dome/login"
+    );
   }
+
   const user = decodedToken.roles;
   // console.log(isPanel);
   if (areEqual(user, Company)) {

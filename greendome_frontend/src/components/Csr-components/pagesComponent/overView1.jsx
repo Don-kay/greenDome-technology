@@ -6,7 +6,7 @@ import RolesCharts from "../minuteComponents/rolesCharts";
 import CourseCharts from "../minuteComponents/courseCharts";
 import RevenueCharts from "../minuteComponents/revenueCharts";
 import StudentsSlice from "../minuteComponents/slicedRolecomp";
-import Calendar from "./calendar";
+import CalendarStudent from "./calendarStudent";
 import EventsChart from "../minuteComponents/eventsChart";
 import { GetAllCourse } from "../../../features/course/courseSlice";
 import RatedCourse from "../minuteComponents/ratedCourse";
@@ -20,6 +20,7 @@ import { Doughnut, Line } from "react-chartjs-2";
 import InfoCard from "../../Cards/InfoCard";
 import ChartCard from "../../Cards/ChartCard";
 import ChartLegend from "../../Cards/ChartLegend";
+import { usePathname } from "next/navigation";
 
 import PageTitle from "../../typography/PageTitle";
 import RoundIcon from "../../icon/RoundIcon";
@@ -41,13 +42,19 @@ const Overview1 = () => {
   // const { course } = useSelector((state) => state.course);
   const loggedInUserId = user.data.user.id;
   const loggedInUser = users?.filter((i) => i.id === loggedInUserId);
-
+  const pathname = usePathname();
   const Student = loggedInUser?.map((i) => {
     return i.roles.includes("student");
   });
+  const Admin = loggedInUser?.map((i) => {
+    return i.roles.includes("Admin");
+  });
 
   const IsStudent = _.toString(Student);
-  // console.log(IsStudent);
+  const IsAdmin = _.toString(Admin);
+
+  const isAdminDashboard = pathname.startsWith("/panel/admin_dashboard/");
+  //console.log(isAdminDashboard);
   // console.log(IsStudentBool);
   // console.log(loggedInUser);
 
@@ -82,19 +89,16 @@ const Overview1 = () => {
     // return () => {
     //   cancelToken.cancel();
     // };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   //console.log(course);
-  // console.log(TotalCourse);
+  //console.log(IsAdmin);
   return (
     <div>
-      {!IsStudent && (
-        <div>
-          <PageTitle>Dashboard</PageTitle>
-
-          {/* <!-- Cards --> */}
-          <RolesCharts />
-        </div>
-      )}
+      <div>
+        <PageTitle>Dashboard</PageTitle>
+        {isAdminDashboard && <RolesCharts />}
+      </div>
 
       {/* <TableContainer>
         <Table>
@@ -159,22 +163,21 @@ const Overview1 = () => {
           isStudent={IsStudent}
         />
       </div>
-      {!IsStudent && (
-        <div>
+
+      {/* <div>
           <PageTitle>Revenue</PageTitle>
 
           <RevenueCharts course={course} />
 
           <StudentsSlice />
-        </div>
-      )}
+        </div> */}
 
       <div className="min-w-innerlay2 flex gap-y-10 flex-col relative top-7 bg-red-700">
         <div className=" text-center">
           <PageTitle>Calendar</PageTitle>
         </div>
 
-        <Calendar params={userParams} isStudent={IsStudent} />
+        <CalendarStudent params={userParams} isStudent={IsStudent} />
         {/* <EventsChart params={userParams} isStudent={IsStudent} /> */}
         {/* <RatedCourse params={userParams} isStudent={IsStudent} /> */}
       </div>

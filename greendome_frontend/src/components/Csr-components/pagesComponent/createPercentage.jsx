@@ -5,13 +5,13 @@ import makeAnimated from "react-select/animated";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import FormRow from "@/components/FormRow";
-import customFetch from "@/utilities/axios";
+import FormRow from "../../FormRow";
+import customFetch from "../../..//utilities/axios";
 import { useRouter } from "next/navigation";
 import {
   getPercentage,
   createPercentage,
-} from "@/features/course/percentage/percentageSlice.jsx";
+} from "../../../features/course/percentage/percentageSlice.jsx";
 
 const initialState = {
   percent: "",
@@ -31,6 +31,7 @@ const CreatePercentage = () => {
   useEffect(() => {
     disPatch(getPercentage());
     setprofitRatio({ percent: percentage });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trigger]);
 
   const handleChange = (e) => {
@@ -39,6 +40,9 @@ const CreatePercentage = () => {
     setprofitRatio({ ...profitRatio, [name]: value });
   };
 
+  const back = () => {
+    router.back();
+  };
   // console.log(percentage);
   // console.log(allpercentage);
 
@@ -69,7 +73,7 @@ const CreatePercentage = () => {
         }
       );
 
-      console.log(resp.data);
+      //console.log(resp.data);
       setTrigger(true);
       // console.log(profitRatio.percent);
       if (resp1 !== "") {
@@ -106,6 +110,7 @@ const CreatePercentage = () => {
             return (
               <div key={idx}>
                 <h2>{`The profit sharing ratio for Greendome technology courses with id ${_id} is set to ${percentage}%`}</h2>
+                <button onClick={() => back()}>back to settings</button>
               </div>
             );
           })}
