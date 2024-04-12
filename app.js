@@ -58,37 +58,37 @@ App.use(
 );
 App.use(express.json());
 
-if (process.env.NODE_ENV === "production") {
-  App.use(
-    cors({ origin: "https://greendometech.netlify.app", credentials: true })
-  );
+// if (process.env.NODE_ENV === "production") {
+App.use(
+  cors({ origin: "https://greendometech.netlify.app", credentials: true })
+);
 
-  App.use("/greendome.onrender.com/auth", AuthRouter);
-  App.use("/greendome.onrender.com/module", Authentication, CourseRouter);
-  App.use("/greendome.onrender.com/course", Authentication, ClassRouter);
-  App.use(
-    "/greendome.onrender.com/finance",
-    Authentication,
-    AuthenticateRoles(Role_List.C1856),
-    RatioRouter
-  );
+App.use("/greendome.onrender.com/auth", AuthRouter);
+App.use("/greendome.onrender.com/module", Authentication, CourseRouter);
+App.use("/greendome.onrender.com/course", Authentication, ClassRouter);
+App.use(
+  "/greendome.onrender.com/finance",
+  Authentication,
+  AuthenticateRoles(Role_List.C1856),
+  RatioRouter
+);
 
-  App.use("/greendome.onrender.com/calendar", Authentication, CalendarRouter);
-} else {
-  App.use(cors({ origin: "http://localhost:3000", credentials: true }));
+App.use("/greendome.onrender.com/calendar", Authentication, CalendarRouter);
+// } else {
+//   App.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
-  App.use("/greendometech/ng/auth", AuthRouter);
-  App.use("/greendometech/ng/module", Authentication, CourseRouter);
-  App.use("/greendometech/ng/course", Authentication, ClassRouter);
-  App.use(
-    "/greendometech/ng/finance",
-    Authentication,
-    AuthenticateRoles(Role_List.C1856),
-    RatioRouter
-  );
+//   App.use("/greendometech/ng/auth", AuthRouter);
+//   App.use("/greendometech/ng/module", Authentication, CourseRouter);
+//   App.use("/greendometech/ng/course", Authentication, ClassRouter);
+//   App.use(
+//     "/greendometech/ng/finance",
+//     Authentication,
+//     AuthenticateRoles(Role_List.C1856),
+//     RatioRouter
+//   );
 
-  App.use("/greendometech/ng/calendar", Authentication, CalendarRouter);
-}
+//   App.use("/greendometech/ng/calendar", Authentication, CalendarRouter);
+// }
 
 // App.use(
 //   cors({
