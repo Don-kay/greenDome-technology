@@ -112,7 +112,7 @@ if (process.env.NODE_ENV === "production") {
 App.use(notFoundMiddleware);
 App.use(errorHandlerMiddleware);
 //connect to mongodb
-const port = process.env.PORT || 8000;
+const port = 8000;
 // const hostname =
 //   process.env.NODE_ENV !== "production" ? 8000 : "greendometech.com";
 
