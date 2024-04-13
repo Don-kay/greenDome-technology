@@ -64,17 +64,17 @@ if (process.env.NODE_ENV === "production") {
     cors({ origin: "https://greendometech.netlify.app", credentials: true })
   );
 
-  App.use("/greendome.onrender.com/auth", AuthRouter);
-  App.use("/greendome.onrender.com/module", Authentication, CourseRouter);
-  App.use("/greendome.onrender.com/course", Authentication, ClassRouter);
+  App.use("/auth", AuthRouter);
+  App.use("/module", Authentication, CourseRouter);
+  App.use("/course", Authentication, ClassRouter);
   App.use(
-    "/greendome.onrender.com/finance",
+    "/finance",
     Authentication,
     AuthenticateRoles(Role_List.C1856),
     RatioRouter
   );
 
-  App.use("/greendome.onrender.com/calendar", Authentication, CalendarRouter);
+  App.use("/calendar", Authentication, CalendarRouter);
 } else if (process.env.NODE_ENV === "development") {
   App.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
@@ -112,7 +112,7 @@ if (process.env.NODE_ENV === "production") {
 App.use(notFoundMiddleware);
 App.use(errorHandlerMiddleware);
 //connect to mongodb
-const port = 8000;
+const port = process.env.PORT || 8000;
 // const hostname =
 //   process.env.NODE_ENV !== "production" ? 8000 : "greendometech.com";
 
