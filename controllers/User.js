@@ -114,19 +114,27 @@ const userNameLogin = async (req, res) => {
   //you must use the new user from findone method to createjwt
   const token = user.CreateJwt();
   // const token = user.CreateJwt();
+  var date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  var expires = date.toUTCString();
 
   res
     .setHeader(
       "set-cookie",
       cookie.serialize("myToken", token, {
-        httpOnly: true,
+        // httpOnly: true,
         secure: process.env.NODE_ENV !== "development",
         sameSite: "none",
         // maxAge: 10,
         path: "/",
       })
     )
-    .cookie("myToken", token, { httpOnly: true, sameSite: "none" })
+    .cookie("myToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      expires: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+    })
     .status(StatusCodes.OK)
     .json({
       user: {
