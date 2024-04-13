@@ -57,6 +57,7 @@ App.use(
   })
 );
 App.use(express.json());
+App.use(express.static("./public"));
 
 if (process.env.NODE_ENV === "production") {
   App.use(
@@ -77,7 +78,7 @@ if (process.env.NODE_ENV === "production") {
 } else if (process.env.NODE_ENV === "development") {
   App.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
-  App.use("/greendometech/ng/auth", AuthRouter);
+  App.use("/greendome.onrender.com/auth", AuthRouter);
   App.use("/greendometech/ng/module", Authentication, CourseRouter);
   App.use("/greendometech/ng/course", Authentication, ClassRouter);
   App.use(
@@ -111,7 +112,7 @@ if (process.env.NODE_ENV === "production") {
 App.use(notFoundMiddleware);
 App.use(errorHandlerMiddleware);
 //connect to mongodb
-const port = process.env.PORT || 8000;
+const port = 10000;
 // const hostname =
 //   process.env.NODE_ENV !== "production" ? 8000 : "greendometech.com";
 
