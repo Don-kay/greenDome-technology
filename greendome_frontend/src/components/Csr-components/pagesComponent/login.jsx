@@ -5,8 +5,8 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../layout_constructs/loading";
 import { setLoading } from "../../../features/user/userSlice";
-import { getPercentage } from "@/features/course/percentage/percentageSlice";
-import { GetAllUsers } from "@/features/profile/profileSlice";
+import { getPercentage } from "../../../features/course/percentage/percentageSlice";
+import { GetAllUsers } from "../../../features/profile/profileSlice";
 import customFetch, { customFetchProduction } from "../../../utilities/axios";
 import { Fetch } from "../../../utilities/axios";
 import {
@@ -148,12 +148,13 @@ const Loginpage = (session) => {
     ).catch((err) => {
       setdisplayError(true);
       setLoading(false);
+      console.log(err.response);
       setError(err.response);
     });
 
     // setData(user1);
 
-    //console.log(user1);
+    console.log(user1);
     const userRole = user1?.data.user?.roles;
     const stats = user1?.status;
 

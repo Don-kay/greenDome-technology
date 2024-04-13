@@ -121,11 +121,12 @@ const userNameLogin = async (req, res) => {
       cookie.serialize("myToken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "development",
+        sameSite: "none",
         // maxAge: 10,
         path: "/",
       })
     )
-    .cookie("myToken", token, { httpOnly: true })
+    .cookie("myToken", token, { httpOnly: true, sameSite: "none" })
     .status(StatusCodes.OK)
     .json({
       user: {
@@ -164,11 +165,12 @@ const logout = async (req, res) => {
       cookie.serialize("myToken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "development",
+        sameSite: "none",
         // maxAge: 10,
         path: "/",
       })
     )
-    .cookie("myToken", token, { httpOnly: true })
+    .cookie("myToken", token, { httpOnly: true, sameSite: "none" })
     .status(StatusCodes.OK)
     .json({
       token,
@@ -211,11 +213,12 @@ const emailLogin = async (req, res) => {
       cookie.serialize("myToken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "development",
+        sameSite: "none",
         // maxAge: 10,
         path: "/",
       })
     )
-    .cookie("myToken", token, { httpOnly: true })
+    .cookie("myToken", token, { httpOnly: true, sameSite: "none" })
     .status(StatusCodes.OK)
     .json({
       user: {
