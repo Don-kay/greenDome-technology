@@ -122,19 +122,19 @@ const userNameLogin = async (req, res) => {
     .setHeader(
       "set-cookie",
       cookie.serialize("myToken", token, {
-        // HttpOnly: true,
-        Secure: true,
-        SameSite: "none",
-        Expires: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+        // httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        expires: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
         // maxAge: 10,
         path: "/",
       })
     )
     .cookie("myToken", token, {
-      // HttpOnly: true,
-      Secure: true,
-      SameSite: "none",
-      Expires: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      expires: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
     })
     .status(StatusCodes.OK)
     .json({
