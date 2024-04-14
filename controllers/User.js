@@ -131,7 +131,7 @@ const userNameLogin = async (req, res) => {
       })
     )
     .cookie("myToken", token, {
-      httpOnly: true,
+      // httpOnly: true,
       secure: true,
       sameSite: "none",
       expires: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
@@ -179,7 +179,7 @@ const logout = async (req, res) => {
         path: "/",
       })
     )
-    .cookie("myToken", token, { httpOnly: true, sameSite: "none" })
+    .cookie("myToken", token, { httpOnly: true })
     .status(StatusCodes.OK)
     .json({
       token,
