@@ -114,9 +114,9 @@ const userNameLogin = async (req, res) => {
   //you must use the new user from findone method to createjwt
   const token = user.CreateJwt();
   // const token = user.CreateJwt();
-  var date = new Date();
-  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-  var expires = date.toUTCString();
+  // var date = new Date();
+  // date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  // var expires = date.toUTCString();
 
   res
     .setHeader(
