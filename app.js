@@ -60,9 +60,7 @@ App.use(express.json());
 App.use(express.static("./public"));
 
 if (process.env.NODE_ENV === "production") {
-  App.use(
-    cors({ origin: "https://greendometech.netlify.app", credentials: true })
-  );
+  App.use(cors({ origin: "https://greendometech.netlify.app" }));
 
   App.use("/auth", AuthRouter);
   App.use("/module", Authentication, CourseRouter);
