@@ -140,11 +140,11 @@ const Loginpage = (session) => {
 
     const user1 = await Fetch.post(
       "/auth/login/username",
+      { withCredentials: true },
       {
         username: username,
         password: password,
-      },
-      { withCredentials: true }
+      }
     ).catch((err) => {
       setdisplayError(true);
       setLoading(false);
@@ -157,20 +157,6 @@ const Loginpage = (session) => {
     console.log(user1);
     const userRole = user1?.data.user?.roles;
     const stats = user1?.status;
-
-    if (stats === 200) {
-      dispatch(getPercentage());
-      dispatch(GetAllUsers());
-      setLoading(false);
-    } else {
-      null;
-    }
-    // if (stats !== 200) {
-    //   dispatch(setLoading(true));
-    // } else {
-    //   dispatch(setLoading(false));
-    // }
-    const error = data.data;
 
     let isCompany = false;
     let isAdmin = false;
@@ -209,6 +195,21 @@ const Loginpage = (session) => {
     if (user1?.status === 200 && isStudent) {
       router.push("/panel/student_dashboard");
     }
+
+    if (stats === 200) {
+      dispatch(getPercentage());
+      dispatch(GetAllUsers());
+      setLoading(false);
+    } else {
+      null;
+    }
+    // if (stats !== 200) {
+    //   dispatch(setLoading(true));
+    // } else {
+    //   dispatch(setLoading(false));
+    // }
+    const error = data.data;
+
     // router.reload;
     // dispatch(setRole(userRole));
 
