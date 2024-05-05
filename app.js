@@ -12,7 +12,6 @@ const bodyParser = require("body-parser");
 
 const cors = require("cors");
 const cookieSession = require("cookie-session");
-const authRoute = require("./routes/auth");
 
 const connectDB = require("./db/connect");
 
