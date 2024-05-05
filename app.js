@@ -25,7 +25,6 @@ App.use(
 );
 //  6. import authRoute
 const AuthRouter = require("./routes/User");
-const googleAuth = require("./routes/auth");
 const CourseRouter = require("./routes/Course");
 const ClassRouter = require("./routes/Class");
 const CalendarRouter = require("./routes/calendar");
@@ -92,7 +91,7 @@ if (process.env.NODE_ENV === "production") {
   // );
 
   App.use("/auth", AuthRouter);
-  App.use("/auth", googleAuth);
+  // App.use("/auth", googleAuth);
   App.use("/module", Authentication, CourseRouter);
   App.use("/course", Authentication, ClassRouter);
   App.use(
