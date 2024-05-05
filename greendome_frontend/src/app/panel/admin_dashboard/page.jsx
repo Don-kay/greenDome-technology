@@ -17,6 +17,17 @@ const Login = () => {
   });
   //console.log(users);
   useEffect(() => {
+    // console.log(window);
+    if (typeof window !== undefined) {
+      window.history.pushState(null, "", window.location.href);
+      window.onpopstate = function () {
+        window.history.pushState(null, "", window.location.href);
+      };
+    } else {
+      return;
+    }
+  }, []);
+  useEffect(() => {
     dispatch(getPercentage());
     dispatch(GetAllUsers());
     if (loggedInUser !== "" || loggedInUser !== undefined) {

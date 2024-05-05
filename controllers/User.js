@@ -96,9 +96,12 @@ const register = async (req, res) => {
 
 const userNameLogin = async (req, res) => {
   const { username, password } = req.body;
+  //console.log(req.body);
   if (!username || !password) {
-    throw new BadRequestError("please provide login details");
+    // console.log(` false ${usernames}`);
+    throw new BadRequestError("please provide login detailer");
   }
+  //console.log(` true ${username}`);
   //check for user
   const user = await User.findOne({ username });
   if (!user) {
@@ -192,16 +195,16 @@ const logout = async (req, res) => {
 };
 const emailLogin = async (req, res) => {
   const { email, password } = req.body;
+
   if (!email || !password) {
     res.status(StatusCodes.BAD_REQUEST).send("please provide login details");
     // throw new BadRequestError("please provide login details");
-    return;
   }
   const user = await User.findOne({ email });
+  //console.log(user);
   if (!user) {
     res.status(StatusCodes.NOT_FOUND).send("Invalid Credentials, sign up");
     // throw new UnauthenticatedError("Invalid Credentials, sign up");
-    return;
   }
   //compare passwords
   const booleanPwd = await user.comparePasswords(password);
@@ -210,7 +213,6 @@ const emailLogin = async (req, res) => {
       .status(StatusCodes.BAD_REQUEST)
       .send("Invalid, provide valid credentials");
     // throw new UnauthenticatedError("Invalid Credentials");
-    return;
   }
   const Roles = user.roles;
   //you must use the new user from findone method to createjwt
@@ -220,14 +222,20 @@ const emailLogin = async (req, res) => {
     .setHeader(
       "set-cookie",
       cookie.serialize("myToken", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== "development",
+        httpOnly: false,
+        secure: true,
         sameSite: "none",
-        // maxAge: 10,
+        maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
         path: "/",
       })
     )
-    .cookie("myToken", token, { httpOnly: true, sameSite: "none" })
+    .cookie("myToken", token, {
+      httpOnly: false,
+      secure: true,
+      sameSite: "none",
+      maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+      path: "/",
+    })
     .status(StatusCodes.OK)
     .json({
       user: {
@@ -242,14 +250,13 @@ const emailLogin = async (req, res) => {
         image: user.image,
       },
     });
-  return;
   // res.send("Login page");
 };
 const GetSingleUsers = async (req, res) => {
   const {
     params: { id: userId },
   } = req;
-  console.log(userId);
+  //console.log(userId);
   const user = await User.findById({ _id: userId });
   if (!user) {
     res.status(StatusCodes.NOT_FOUND).send("no user found");

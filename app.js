@@ -11,6 +11,8 @@ const mongoDBsession = require("connect-mongodb-session")(session);
 const bodyParser = require("body-parser");
 
 const cors = require("cors");
+const cookieSession = require("cookie-session");
+const authRoute = require("./routes/auth");
 
 const connectDB = require("./db/connect");
 
@@ -24,6 +26,7 @@ App.use(
 );
 //  6. import authRoute
 const AuthRouter = require("./routes/User");
+const googleAuth = require("./routes/auth");
 const CourseRouter = require("./routes/Course");
 const ClassRouter = require("./routes/Class");
 const CalendarRouter = require("./routes/calendar");
@@ -47,28 +50,50 @@ const store = new mongoDBsession({
 
 // setup app.use() middleware
 
+// App.use(
+//   cookieSession({
+//     name: "session",
+//     keys: ["blaketech"],
+//     maxAge: 24 * 60 * 60 * 100,
+//   })
+// );
+// App.use(passport.initialize());
+// App.use(passport.session());
 App.use(
   session({
     secret: "##creativE001",
-    cookie: { maxAge: 30000 },
+    cookie: {
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production" && true,
+    },
     resave: false,
     saveUninitialized: false,
     store: store,
   })
 );
+
 App.use(express.json());
+
 App.use(express.static("./public"));
 
 if (process.env.NODE_ENV === "production") {
   App.use(
     cors({
-      origin: "https://greendometech.netlify.app",
-      // preflightContinue: true,
+      origin: "https://greendometech.onrender.com",
+      methods: "GET,POST,PUT,DELETE",
       credentials: true,
     })
   );
+  // App.use(
+  //   cors({
+  //     origin: "https://greendometech.netlify.app",
+  //     // preflightContinue: true,
+  //     credentials: true,
+  //   })
+  // );
 
   App.use("/auth", AuthRouter);
+  App.use("/auth", googleAuth);
   App.use("/module", Authentication, CourseRouter);
   App.use("/course", Authentication, ClassRouter);
   App.use(
@@ -80,9 +105,17 @@ if (process.env.NODE_ENV === "production") {
 
   App.use("/calendar", Authentication, CalendarRouter);
 } else if (process.env.NODE_ENV === "development") {
-  App.use(cors({ origin: "http://localhost:3000", credentials: true }));
+  App.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
+
+  //App.use("/auth", authRoute);
 
   App.use("/greendometech/ng/auth", AuthRouter);
+
   App.use("/greendometech/ng/module", Authentication, CourseRouter);
   App.use("/greendometech/ng/course", Authentication, ClassRouter);
   App.use(
@@ -94,7 +127,7 @@ if (process.env.NODE_ENV === "production") {
 
   App.use("/greendometech/ng/calendar", Authentication, CalendarRouter);
 }
-
+App.use(errorHandlerMiddleware);
 // App.use(
 //   cors({
 //     origin:
@@ -113,8 +146,9 @@ if (process.env.NODE_ENV === "production") {
 // });
 
 // 7. create a errohandlermiddlare, the error handler middleware must come below the routes
+
 App.use(notFoundMiddleware);
-App.use(errorHandlerMiddleware);
+
 //connect to mongodb
 const port = process.env.PORT || 8000;
 // const hostname =
