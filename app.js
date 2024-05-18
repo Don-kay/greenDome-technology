@@ -77,7 +77,7 @@ App.use(express.static("./public"));
 if (process.env.NODE_ENV === "production") {
   App.use(
     cors({
-      origin: "https://greendometech.onrender.com",
+      origin: "https://greendometech.netlify.app",
       methods: "GET,POST,PUT,DELETE",
       credentials: true,
     })

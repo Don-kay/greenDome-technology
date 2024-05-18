@@ -10,8 +10,12 @@ import {
   Tutor,
   Student,
 } from "./components/ROLE_LISTS";
+import Localbase from "localbase";
+
 import moment from "moment";
 // import { jwtVerify } from "jose";
+
+let db = new Localbase("db");
 
 const isProfileRoute = (pathname) => {
   return pathname.includes("/view_profile");
@@ -64,6 +68,15 @@ const array = {};
 
 export default function middleware(req, res) {
   const { cookies } = req;
+  //console.log(req);
+  // localStorage.getItem("user");
+  // const userTok = getToken ? JSON.parse(getToken) : null;
+  // console.log(userTok);
+  // db.collection("cookie")
+  //   .get()
+  //   .then((document) => {
+  //     console.log(document);
+  //   });
   const jwt = cookies.get("myToken")?.value;
   const { pathname } = req.nextUrl;
   const { referer } = req.headers;
@@ -76,7 +89,6 @@ export default function middleware(req, res) {
   let isPanel = false;
   let isTutor = false;
 
-  //console.log(req);
   const env = process.env.NODE_ENV;
 
   if (

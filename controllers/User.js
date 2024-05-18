@@ -122,16 +122,16 @@ const userNameLogin = async (req, res) => {
   // var expires = date.toUTCString();
 
   res
-    .setHeader(
-      "set-cookie",
-      cookie.serialize("myToken", token, {
-        httpOnly: false,
-        secure: true,
-        sameSite: "none",
-        maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-        path: "/",
-      })
-    )
+    // .setHeader(
+    //   "set-cookie",
+    //   cookie.serialize("myToken", token, {
+    //     httpOnly: false,
+    //     secure: true,
+    //     sameSite: "none",
+    //     maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+    //     path: "/",
+    //   })
+    // )
     .cookie("myToken", token, {
       httpOnly: false,
       secure: true,
@@ -145,6 +145,7 @@ const userNameLogin = async (req, res) => {
         msg: "succesfully signed in",
         id: user._id,
         firstname: user.firstname,
+        token: token,
         username: user.username,
         email: user.email,
         country: user.country,

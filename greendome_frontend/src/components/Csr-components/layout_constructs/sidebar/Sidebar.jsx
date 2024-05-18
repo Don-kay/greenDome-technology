@@ -143,10 +143,10 @@ export const Sidebar = ({ mobileOrientation, IsAdmin, IsStudent }) => {
         isAdminDashboard
           ? `${style.default} 
         ${style.mobileOrientation[mobileOrientation]} 
-        ${sidebarOpen ? style.open : style.close} ${css.scrollbar}`
+        ${sidebarOpen ? style.open : style.close} `
           : `${style.default1} 
         ${style.mobileOrientation[mobileOrientation]} 
-        ${sidebarOpen ? style.open : style.close} ${css.scrollbar}`
+        ${sidebarOpen ? style.open : style.close}`
       }
     >
       {/* <EditProfile
