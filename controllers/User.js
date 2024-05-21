@@ -132,13 +132,13 @@ const userNameLogin = async (req, res) => {
     //     // path: "/",
     //   })
     // )
-    .cookie("myToken", token, {
-      httpOnly: false,
-      secure: true,
-      sameSite: "none",
-      maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-      // path: "/",
-    })
+    // .cookie("myToken", token, {
+    //   httpOnly: false,
+    //   secure: true,
+    //   sameSite: "none",
+    //   maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+    //   // path: "/",
+    // })
     .status(StatusCodes.OK)
     .json({
       user: {
