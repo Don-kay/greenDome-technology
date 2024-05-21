@@ -121,39 +121,20 @@ const userNameLogin = async (req, res) => {
   // date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
   // var expires = date.toUTCString();
 
-  res
-    // .setHeader(
-    //   "set-cookie",
-    //   cookie.serialize("myToken", token, {
-    //     httpOnly: false,
-    //     secure: true,
-    //     sameSite: "none",
-    //     maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-    //     // path: "/",
-    //   })
-    // )
-    // .cookie("myToken", token, {
-    //   httpOnly: false,
-    //   secure: true,
-    //   sameSite: "none",
-    //   maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-    //   // path: "/",
-    // })
-    .status(StatusCodes.OK)
-    .json({
-      user: {
-        msg: "succesfully signed in",
-        id: user._id,
-        firstname: user.firstname,
-        token: token,
-        username: user.username,
-        email: user.email,
-        country: user.country,
-        mobilenumber: user.mobilenumber,
-        roles: Roles,
-        image: user.image,
-      },
-    });
+  res.status(StatusCodes.OK).json({
+    user: {
+      msg: "succesfully signed in",
+      id: user._id,
+      firstname: user.firstname,
+      token: token,
+      username: user.username,
+      email: user.email,
+      country: user.country,
+      mobilenumber: user.mobilenumber,
+      roles: Roles,
+      image: user.image,
+    },
+  });
 
   // res.send("Login page");
 };
@@ -448,3 +429,21 @@ module.exports = {
   UpdateAllProfile,
   DeleteAllProfile,
 };
+
+// .setHeader(
+//   "set-cookie",
+//   cookie.serialize("myToken", token, {
+//     httpOnly: false,
+//     secure: true,
+//     sameSite: "none",
+//     maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+//     // path: "/",
+//   })
+// )
+// .cookie("myToken", token, {
+//   httpOnly: false,
+//   secure: true,
+//   sameSite: "none",
+//   maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+//   // path: "/",
+// })
