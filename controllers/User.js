@@ -4,6 +4,7 @@ const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 var _ = require("lodash");
 const cloudinary = require("../config/cloudinary");
+const cookieCutter = require("cookie-cutter");
 const {
   BadRequestError,
   UnauthenticatedError,
@@ -121,20 +122,29 @@ const userNameLogin = async (req, res) => {
   // date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
   // var expires = date.toUTCString();
 
-  res.status(StatusCodes.OK).json({
-    user: {
-      msg: "succesfully signed in",
-      id: user._id,
-      firstname: user.firstname,
-      token: token,
-      username: user.username,
-      email: user.email,
-      country: user.country,
-      mobilenumber: user.mobilenumber,
-      roles: Roles,
-      image: user.image,
-    },
-  });
+  res
+    .cookie("myToken", token, {
+      httpOnly: false,
+      secure: true,
+      sameSite: "none",
+      maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+      path: "/",
+    })
+    .status(StatusCodes.OK)
+    .json({
+      user: {
+        msg: "succesfully signed in",
+        id: user._id,
+        firstname: user.firstname,
+        token: token,
+        username: user.username,
+        email: user.email,
+        country: user.country,
+        mobilenumber: user.mobilenumber,
+        roles: Roles,
+        image: user.image,
+      },
+    });
 
   // res.send("Login page");
 };
