@@ -34,7 +34,7 @@ import { Label, Input, Button } from "@roketid/windmill-react-ui";
 import { FaGithubAlt } from "react-icons/fa";
 import { BsTwitterX } from "react-icons/bs";
 import Greendome from "../../asset/greendome.jpg";
-// import cookieCutter from "cookie-cutter";
+import cookieCutter from "cookie-cutter";
 import PageTitle from "../../typography/PageTitle";
 
 // async function create(data) {
@@ -250,26 +250,26 @@ const Loginpage = (session) => {
 
     // setData(user1);
 
-    console.log(user1);
+    //console.log(user1);
     const userRole = user1?.data.user?.roles;
     const userToken = user1?.data.user?.token;
 
     // localStorage.setItem("user", JSON.stringify(userToken));
 
     const stats = user1?.status;
-    console.log(userToken);
+    //console.log(userToken);
 
-    // if (userToken === undefined || userToken === "") {
-    //   return null;
-    // } else {
-    //   cookieCutter.set("myToken", userToken, {
-    //     httpOnly: false,
-    //     secure: true,
-    //     sameSite: "none",
-    //     maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-    //     path: "/",
-    //   });
-    // }
+    if (userToken === undefined || userToken === "") {
+      return null;
+    } else {
+      cookieCutter.set("myToken", userToken, {
+        httpOnly: false,
+        secure: true,
+        sameSite: "none",
+        maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+        path: "/",
+      });
+    }
 
     let isCompany = false;
     let isAdmin = false;
@@ -336,6 +336,12 @@ const Loginpage = (session) => {
       email: email,
       password: password,
     };
+    dispatch(
+      loginUserEmail({
+        email: email,
+        password: password,
+      })
+    );
     if (!email || !password) {
       toast.error("please fill out all details");
       setLoading(false);
@@ -364,7 +370,20 @@ const Loginpage = (session) => {
     }
 
     const userRole = user1?.data.user?.roles;
+    const userToken = user1?.data.user?.token;
     const error = data.data;
+
+    if (userToken === undefined || userToken === "") {
+      return null;
+    } else {
+      cookieCutter.set("myToken", userToken, {
+        httpOnly: false,
+        secure: true,
+        sameSite: "none",
+        maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+        path: "/",
+      });
+    }
     //console.log(user1);
     let isCompany = false;
     let isAdmin = false;
@@ -399,12 +418,6 @@ const Loginpage = (session) => {
       router.push("/panel/student_dashboard");
     }
 
-    dispatch(
-      loginUserEmail({
-        email: email,
-        password: password,
-      })
-    );
     // console.log(user);
   };
   // const getUser = async () => {

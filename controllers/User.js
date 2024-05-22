@@ -211,16 +211,16 @@ const emailLogin = async (req, res) => {
   const token = user.CreateJwt();
 
   res
-    .setHeader(
-      "set-cookie",
-      cookie.serialize("myToken", token, {
-        httpOnly: false,
-        secure: true,
-        sameSite: "none",
-        maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-        path: "/",
-      })
-    )
+    // .setHeader(
+    //   "set-cookie",
+    //   cookie.serialize("myToken", token, {
+    //     httpOnly: false,
+    //     secure: true,
+    //     sameSite: "none",
+    //     maxAge: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+    //     path: "/",
+    //   })
+    // )
     .cookie("myToken", token, {
       httpOnly: false,
       secure: true,
@@ -235,6 +235,7 @@ const emailLogin = async (req, res) => {
         id: user._id,
         firstname: user.firstname,
         username: user.username,
+        token: token,
         email: user.email,
         country: user.country,
         mobilenumber: user.mobilenumber,
