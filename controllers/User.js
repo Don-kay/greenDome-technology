@@ -177,8 +177,8 @@ const logout = async (req, res) => {
     .cookie("myToken", token, { httpOnly: true })
     .status(StatusCodes.OK)
     .json({
-      token,
       data: {
+        token: token,
         msg: "succesfully logged out",
       },
     });
